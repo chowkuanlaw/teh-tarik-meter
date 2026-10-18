@@ -12,7 +12,6 @@
 <p align="center">
   <b><a href="https://github.com/chowkuanlaw/teh-tarik-meter/releases/latest">Download for Windows</a></b> ·
   <a href="#what-it-does">Features</a> ·
-  <a href="#the-easter-egg">The easter egg</a> ·
   <a href="#install">Install</a> ·
   <a href="PRIVACY.md">Privacy</a> ·
   <a href="CHANGELOG.md">Changelog</a> ·
@@ -39,7 +38,6 @@ It's a sibling of [Lapis](https://github.com/chowkuanlaw/lapis-stretch), the kui
 | 🙈 **Stays out of the way** | Hides itself during full screen apps and presentations. **Ctrl+Alt+T** shows or hides it. The tray icon drains too, with your numbers on hover. |
 | 🎉 **Festive outfits** | Hari Raya, Chinese New Year, Deepavali, Kaamatan, Gawai, Merdeka, Malaysia Day and Christmas. |
 | 👀 **Peek before you sign in** | "Peek at a sample first" shows everything with made-up numbers. Nothing is fetched or saved. |
-| 🎪 **Poke it** | It reacts. Poke it 10 times quickly and it puts on a full-screen show. |
 
 ## The glass has moods
 
@@ -59,19 +57,7 @@ When the session resets, a pulling mug pours a fresh drink into the glass.
 
 <p align="center"><img src="docs/images/drinks.png" alt="The widget as teh tarik, kopi O, teh ais with ice, Milo ais with ice, and pink sirap bandung" width="900"></p>
 
-The glass, the weekly cups, the tray icon and the easter egg all follow your drink. Iced drinks get ice cubes instead of steam. Change it any time in **Settings › Look**.
-
-## The easter egg
-
-Poke the glass **10 times in 4 seconds**. The meter takes over the screen for about 16 seconds: a 2-second joget, then your drink made from start to finish, with a music-box chime made on the spot (no sound files). Every drink has its own recipe and its own words, in English and Bahasa Melayu. **Esc** or **Skip** ends it early.
-
-<table>
-<tr><td width="150"><b>Teh tarik</b><br><sub>Bancuh · Susu · Tarik · Siap</sub></td><td><img src="docs/images/show-tehtarik.jpg" alt="Teh tarik show: tea through the cloth strainer, condensed milk, three high pulls, served, and the bow"></td></tr>
-<tr><td><b>Kopi O</b><br><sub>Bancuh · Gula · Tarik · Siap</sub></td><td><img src="docs/images/show-kopio.jpg" alt="Kopi O show: coffee sock, a spoon of sugar, pulling, served hot and black"></td></tr>
-<tr><td><b>Teh ais</b><br><sub>Bancuh · Susu · Tarik · Ais</sub></td><td><img src="docs/images/show-tehais.jpg" alt="Teh ais show: strong tea, milk, pulled to cool, ice drops into the glass and the tea is poured over"></td></tr>
-<tr><td><b>Milo ais</b><br><sub>Milo · Air panas · Kacau · Ais</sub></td><td><img src="docs/images/show-milo.jpg" alt="Milo ais show: scoops of powder, hot water from a kettle, stirring, ice, then a heap of powder on top"></td></tr>
-<tr><td><b>Sirap bandung</b><br><sub>Sirap · Susu · Kacau · Ais</sub></td><td><img src="docs/images/show-bandung.jpg" alt="Sirap bandung show: rose syrup, milk swirling it pink, stirring, lots of ice"></td></tr>
-</table>
+The glass, the weekly cups and the tray icon all follow your drink. Iced drinks get ice cubes instead of steam. Change it any time in **Settings › Look**.
 
 ## Festive outfits
 
@@ -178,7 +164,6 @@ To release, bump `version` in `package.json`, add a `## <version>` section to `C
 - Kemas kini serta-merta dengan Claude Code.
 - Lima minuman (teh tarik, kopi O, Milo ais, teh ais, sirap bandung), mod gelap, dan semua skrin dalam Bahasa Melayu.
 - Pakaian perayaan untuk Hari Raya, Tahun Baru Cina, Deepavali, Kaamatan, Gawai, Merdeka, Hari Malaysia dan Krismas.
-- Cucuk gelas 10 kali dengan pantas untuk satu kejutan.
 
 Muat turun dari [Releases](https://github.com/chowkuanlaw/teh-tarik-meter/releases/latest). Jika Windows memaparkan amaran, klik **More info**, kemudian **Run anyway**. Tukar bahasa di **Tetapan › Rupa › Bahasa**. Apl ini tidak membaca perbualan anda dan tidak menghantar apa-apa tentang anda ke tempat lain.
 
