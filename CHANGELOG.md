@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.1 (2026-10-18)
+
+- **Every drink's show has its own captions.** Before, all five shows opened with the same line, teh ais reused teh tarik's first three steps, and several steps and bows shared titles ("Tarik! Tarik! Tarik!", "Ais!", "Back to work lah"). Now each drink has its own words for all seven moments, in English and Bahasa Melayu, for example "Ten pokes?! Need kopi ah?", "Step 3 · Tarik sejuk!" (teh ais) and "Step 4 · Ais & rahsia" (Milo ais).
+- The glass's "Sign in so I can watch your…" and one of its poke replies now name your drink instead of always saying teh tarik.
+- A test now fails if two drinks ever share a caption.
+
 ## 1.3.0 (2026-10-18)
 
 - **Peek at a sample.** When you're signed out, "Peek at a sample first" shows the widget, the forecast and the History tab with made-up numbers. Nothing is fetched or saved, no alerts fire, and signing in (or "Back to sign in") ends it.

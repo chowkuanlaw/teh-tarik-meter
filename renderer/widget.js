@@ -148,8 +148,8 @@
     else if (combo >= 9) line = t('combo.9');
     else if (combo >= 7) line = t('combo.7');
     else if (combo >= 5) line = t('combo.5');
-    else if (pokeIdx >= 0 && combo > 0) line = t('poke.' + pokeIdx);
-    else if (signedOut) line = t('line.signedOut');
+    else if (pokeIdx >= 0 && combo > 0) line = t('poke.' + pokeIdx, dv);
+    else if (signedOut) line = t('line.signedOut', dv);
     else if (preview) line = t('line.preview', dv);
     else if (s && s.formatBroken) line = t('line.format');
     else if (!hasData) line = t('line.starting', dv);

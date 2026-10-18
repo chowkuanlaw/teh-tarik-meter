@@ -19,7 +19,7 @@
   const PHASES = ['intro', 'dance', 's1', 's2', 's3', 's4', 'bow'];
   const ENDS = [1000, 3000, 5500, 7500, 12000, 14500, 16500];
   let drink = D.drink('tehtarik'), R = D.recipe('tehtarik');
-  const capKey = phase => (phase === 'intro' ? 'intro' : R.caps[PHASES.indexOf(phase) - 1]);
+  const capKey = phase => R.caps[PHASES.indexOf(phase)];
   const cap = phase => t('show.' + capKey(phase)).split('|');
 
   // Colours for the in-between moments of the glass recipes.

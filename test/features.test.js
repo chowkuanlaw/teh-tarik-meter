@@ -154,7 +154,7 @@ test('every drink has its own easter egg recipe, with captions in both languages
   for (const d of D.DRINKS) {
     const r = D.RECIPES[d.id];
     assert.ok(r, `recipe for ${d.id}`);
-    assert.equal(r.steps.length, 4); assert.equal(r.kinds.length, 4); assert.equal(r.caps.length, 6);
+    assert.equal(r.steps.length, 4); assert.equal(r.kinds.length, 4); assert.equal(r.caps.length, 7);
     for (const k of r.kinds) assert.ok(kinds.includes(k), `known step ${k}`);
     for (const c of r.caps) for (const lang of ['en', 'ms']) {
       assert.ok(Object.prototype.hasOwnProperty.call(I.DICTS[lang], 'show.' + c), `${lang} show.${c}`);
@@ -162,6 +162,13 @@ test('every drink has its own easter egg recipe, with captions in both languages
     }
   }
   assert.equal(D.recipe('nope'), D.RECIPES.tehtarik);
+  // Each moment of the show reads differently for every drink, in both languages.
+  for (const lang of ['en', 'ms']) for (let i = 0; i < 7; i++) {
+    const titles = D.DRINKS.map(d => I.t(lang, 'show.' + D.RECIPES[d.id].caps[i]).split('|')[0]);
+    const lines = D.DRINKS.map(d => I.t(lang, 'show.' + D.RECIPES[d.id].caps[i]).split('|')[1]);
+    assert.equal(new Set(titles).size, titles.length, `${lang} moment ${i}: titles repeat (${titles.join(' / ')})`);
+    assert.equal(new Set(lines).size, lines.length, `${lang} moment ${i}: lines repeat`);
+  }
   assert.ok(D.RECIPES.milo.kinds.includes('icetop') && D.RECIPES.bandung.kinds.includes('stir') && !D.RECIPES.bandung.kinds.includes('pull'));
 });
 

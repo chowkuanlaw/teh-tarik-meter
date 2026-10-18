@@ -17,18 +17,18 @@
   /* ---------- the easter egg, one recipe per drink (1.2.0) ----------
      Four steps each. steps = the chips under the stage (kept in Malay in both languages),
      kinds = which animation each step plays (show.js), caps = caption keys ("show." + key)
-     for the joget, the four steps and the bow. The intro caption is shared. */
+     for the intro, the joget, the four steps and the bow, each drink with its own words. */
   const RECIPES = {
     tehtarik: { steps: ['Bancuh', 'Susu', 'Tarik', 'Siap'], kinds: ['brew', 'milk', 'pull', 'serve'],
-      caps: ['dance', 'brew', 'milk', 'pull', 'serve', 'bow'] },
+      caps: ['intro', 'dance', 'brew', 'milk', 'pull', 'serve', 'bow'] },
     kopio: { steps: ['Bancuh', 'Gula', 'Tarik', 'Siap'], kinds: ['brew', 'sugar', 'pull', 'serve'],
-      caps: ['kopio.dance', 'kopio.brew', 'kopio.sugar', 'kopio.pull', 'kopio.serve', 'kopio.bow'] },
+      caps: ['kopio.intro', 'kopio.dance', 'kopio.brew', 'kopio.sugar', 'kopio.pull', 'kopio.serve', 'kopio.bow'] },
     tehais: { steps: ['Bancuh', 'Susu', 'Tarik', 'Ais'], kinds: ['brew', 'milk', 'pull', 'iceserve'],
-      caps: ['tehais.dance', 'brew', 'milk', 'pull', 'tehais.serve', 'tehais.bow'] },
+      caps: ['tehais.intro', 'tehais.dance', 'tehais.brew', 'tehais.milk', 'tehais.pull', 'tehais.serve', 'tehais.bow'] },
     milo: { steps: ['Milo', 'Air panas', 'Kacau', 'Ais'], kinds: ['scoop', 'water', 'stir', 'icetop'],
-      caps: ['milo.dance', 'milo.scoop', 'milo.water', 'milo.stir', 'milo.ice', 'milo.bow'] },
+      caps: ['milo.intro', 'milo.dance', 'milo.scoop', 'milo.water', 'milo.stir', 'milo.ice', 'milo.bow'] },
     bandung: { steps: ['Sirap', 'Susu', 'Kacau', 'Ais'], kinds: ['syrup', 'swirl', 'stir', 'ice'],
-      caps: ['bandung.dance', 'bandung.syrup', 'bandung.milk', 'bandung.stir', 'bandung.ice', 'bandung.bow'] }
+      caps: ['bandung.intro', 'bandung.dance', 'bandung.syrup', 'bandung.milk', 'bandung.stir', 'bandung.ice', 'bandung.bow'] }
   };
   const recipe = id => RECIPES[id] || RECIPES.tehtarik;
 
@@ -63,6 +63,7 @@
 
   /* ---------- what's new ---------- */
   const NEWS = [
+    { v: '1.3.1', keys: ['news.1.3.1.a'] },
     { v: '1.3.0', keys: ['news.1.3.0.a', 'news.1.3.0.b'] },
     { v: '1.2.0', keys: ['news.1.2.0.a'] },
     { v: '1.1.0', keys: ['news.1.1.0.a', 'news.1.1.0.b', 'news.1.1.0.c', 'news.1.1.0.d', 'news.1.1.0.e'] }
