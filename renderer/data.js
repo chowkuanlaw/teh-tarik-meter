@@ -14,6 +14,24 @@
   const DRINK_BY = Object.fromEntries(DRINKS.map(d => [d.id, d]));
   const drink = id => DRINK_BY[id] || DRINKS[0];
 
+  /* ---------- the easter egg, one recipe per drink (1.2.0) ----------
+     Four steps each. steps = the chips under the stage (kept in Malay in both languages),
+     kinds = which animation each step plays (show.js), caps = caption keys ("show." + key)
+     for the joget, the four steps and the bow. The intro caption is shared. */
+  const RECIPES = {
+    tehtarik: { steps: ['Bancuh', 'Susu', 'Tarik', 'Siap'], kinds: ['brew', 'milk', 'pull', 'serve'],
+      caps: ['dance', 'brew', 'milk', 'pull', 'serve', 'bow'] },
+    kopio: { steps: ['Bancuh', 'Gula', 'Tarik', 'Siap'], kinds: ['brew', 'sugar', 'pull', 'serve'],
+      caps: ['kopio.dance', 'kopio.brew', 'kopio.sugar', 'kopio.pull', 'kopio.serve', 'kopio.bow'] },
+    tehais: { steps: ['Bancuh', 'Susu', 'Tarik', 'Ais'], kinds: ['brew', 'milk', 'pull', 'iceserve'],
+      caps: ['tehais.dance', 'brew', 'milk', 'pull', 'tehais.serve', 'tehais.bow'] },
+    milo: { steps: ['Milo', 'Air panas', 'Kacau', 'Ais'], kinds: ['scoop', 'water', 'stir', 'icetop'],
+      caps: ['milo.dance', 'milo.scoop', 'milo.water', 'milo.stir', 'milo.ice', 'milo.bow'] },
+    bandung: { steps: ['Sirap', 'Susu', 'Kacau', 'Ais'], kinds: ['syrup', 'swirl', 'stir', 'ice'],
+      caps: ['bandung.dance', 'bandung.syrup', 'bandung.milk', 'bandung.stir', 'bandung.ice', 'bandung.bow'] }
+  };
+  const recipe = id => RECIPES[id] || RECIPES.tehtarik;
+
   /* ---------- festive outfits (1.1.0, dates from Lapis) ----------
      The festive day of each festival (Malaysian public holidays). The outfit shows on the
      4 days before and on the day itself; when two overlap, the closer festival wins. */
@@ -45,6 +63,7 @@
 
   /* ---------- what's new ---------- */
   const NEWS = [
+    { v: '1.2.0', keys: ['news.1.2.0.a'] },
     { v: '1.1.0', keys: ['news.1.1.0.a', 'news.1.1.0.b', 'news.1.1.0.c', 'news.1.1.0.d', 'news.1.1.0.e'] }
   ];
   // Is version a newer than version b? ("1.10.0" is newer than "1.9.0")
@@ -56,7 +75,7 @@
   // News since the version you last used (all of it if you're new).
   const newsSince = seen => NEWS.filter(n => !seen || newer(n.v, seen));
 
-  const api = { DRINKS, DRINK_BY, drink, FESTIVAL_DAYS, festivalOn, dayKey, NEWS, newer, newsSince };
+  const api = { DRINKS, DRINK_BY, drink, RECIPES, recipe, FESTIVAL_DAYS, festivalOn, dayKey, NEWS, newer, newsSince };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.TTData = api;
 })(typeof window !== 'undefined' ? window : globalThis);

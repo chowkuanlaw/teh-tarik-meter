@@ -16,7 +16,7 @@ Your Claude usage as a living glass of teh tarik. A small Windows desktop widget
 - **Stays out of the way.** Hides itself in full screen and presentations; Ctrl+Alt+T shows or hides it.
 - **Festive outfits** for Hari Raya, Chinese New Year, Deepavali, Kaamatan, Gawai, Merdeka, Malaysia Day and Christmas.
 - **More alerts:** "fresh glass ready" after you hit the limit, and a warning if claude.ai changes its usage page.
-- **Poke the glass.** It reacts. Poke it 10 times in 4 seconds for a full-screen teh tarik show with chimes (Skip or Esc ends it).
+- **Poke the glass.** It reacts. Poke it 10 times in 4 seconds for a full-screen show with chimes that makes your drink from start to finish: teh tarik and kopi O are pulled, teh ais gets ice, Milo ais is topped dinosaur style and sirap bandung swirls pink (Skip or Esc ends it).
 
 ## Where the numbers come from
 

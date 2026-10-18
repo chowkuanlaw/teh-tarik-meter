@@ -119,8 +119,9 @@ test('festive outfits show 4 days before and on the day', () => {
 test("what's new: since the version you last used", () => {
   assert.equal(D.newer('1.10.0', '1.9.0'), true);
   assert.equal(D.newer('1.1.0', '1.1.0'), false);
-  assert.deepEqual(D.newsSince('1.0.0').map(n => n.v), ['1.1.0']);
-  assert.deepEqual(D.newsSince('1.1.0'), []);
+  assert.deepEqual(D.newsSince('1.0.0').map(n => n.v), ['1.2.0', '1.1.0']);
+  assert.deepEqual(D.newsSince('1.1.0').map(n => n.v), ['1.2.0']);
+  assert.deepEqual(D.newsSince('1.2.0'), []);
   const pkg = require('../package.json');
   assert.equal(D.NEWS[0].v, pkg.version, 'the newest news matches package.json');
 });
@@ -133,6 +134,22 @@ test('every English text has a Malay one, with the same placeholders', () => {
   for (const k of Object.keys(en)) assert.equal(ph(ms[k]), ph(en[k]), `placeholders differ in ${k}`);
   for (const n of D.NEWS) for (const k of n.keys) assert.ok(en[k] && ms[k], `news text ${k}`);
   for (const p of ['intro', 'dance', 'brew', 'milk', 'pull', 'serve', 'bow']) assert.equal(I.t('ms', 'show.' + p).split('|').length, 2);
+});
+
+test('every drink has its own easter egg recipe, with captions in both languages', () => {
+  const kinds = ['brew', 'milk', 'sugar', 'pull', 'serve', 'iceserve', 'scoop', 'water', 'stir', 'syrup', 'swirl', 'ice', 'icetop'];
+  for (const d of D.DRINKS) {
+    const r = D.RECIPES[d.id];
+    assert.ok(r, `recipe for ${d.id}`);
+    assert.equal(r.steps.length, 4); assert.equal(r.kinds.length, 4); assert.equal(r.caps.length, 6);
+    for (const k of r.kinds) assert.ok(kinds.includes(k), `known step ${k}`);
+    for (const c of r.caps) for (const lang of ['en', 'ms']) {
+      assert.ok(Object.prototype.hasOwnProperty.call(I.DICTS[lang], 'show.' + c), `${lang} show.${c}`);
+      assert.equal(I.t(lang, 'show.' + c).split('|').length, 2, `${lang} show.${c} has a title and a line`);
+    }
+  }
+  assert.equal(D.recipe('nope'), D.RECIPES.tehtarik);
+  assert.ok(D.RECIPES.milo.kinds.includes('icetop') && D.RECIPES.bandung.kinds.includes('stir') && !D.RECIPES.bandung.kinds.includes('pull'));
 });
 
 test('t() fills in values and falls back to English', () => {
@@ -160,7 +177,7 @@ test('upgrading from 1.0.0 skips the welcome and shows what is new', () => {
   const s = ST.clean({ orgId: 'aaaaaaaa-1111', last: { at: 5, session: { pct: 3 } } });
   assert.equal(s.welcomed, true);
   assert.equal(s.seenVersion, '1.0.0');
-  assert.deepEqual(D.newsSince(s.seenVersion).map(n => n.v), ['1.1.0']);
+  assert.deepEqual(D.newsSince(s.seenVersion).map(n => n.v), ['1.2.0', '1.1.0']);
 });
 
 test('a broken settings file is restored from the daily backup', () => {

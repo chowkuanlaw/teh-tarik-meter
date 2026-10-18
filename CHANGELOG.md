@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.0 (2026-10-18)
+
+- **An easter egg for every drink.** Poke the glass 10 times and the show now makes the drink you picked:
+  - **Kopi O:** coffee through the sock, a spoon of sugar and no milk, three pulls, served hot and black.
+  - **Teh ais:** the teh tarik steps, then ice into the glass with a clink, and the tea poured over.
+  - **Milo ais:** two scoops of powder, hot water from the kettle, *Kacau! ×3*, ice, and a surprise heap of powder on top (Milo dinosaur).
+  - **Sirap bandung:** rose syrup, milk swirling it pink, a stir instead of a pull, and lots of ice.
+  - Teh tarik stays as it was. Captions are in English and Bahasa Melayu, and the music adds spoon and ice clinks.
+
 ## 1.1.0 (2026-10-18)
 
 - **Burn-rate forecast.** Under your session, the widget says when the glass runs out at your current pace ("At this pace: runs out 3:40 PM") or that it lasts till the refill. The week gets the same. An optional alert warns you before you run out.

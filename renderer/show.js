@@ -1,13 +1,14 @@
 'use strict';
 /*
  * The easter egg (poke the glass 10 times in 4 seconds): a full-screen show.
- * 1 s intro, 2 s joget, then a whole teh tarik made start to finish:
- * bancuh teh, susu pekat, three pulls, into the glass, and a bow. About 16 seconds,
- * with a music-box chime made on the spot (no sound files).
+ * 1 s intro, 2 s joget, then your drink made start to finish in four steps, and a bow.
+ * Each drink has its own recipe (TTData.RECIPES): teh tarik and kopi O are pulled,
+ * teh ais gets ice, Milo ais is stirred and topped dinosaur style, sirap bandung swirls pink.
+ * About 16 seconds, with a music-box chime made on the spot (no sound files).
  */
 (function () {
   if (!window.ttm || window.ttm.view !== 'show') return;
-  const G = window.TTGlass, I = window.TTI18n;
+  const G = window.TTGlass, I = window.TTI18n, D = window.TTData;
   let lang = 'en';
   const t = k => I.t(lang, k);
   const $ = id => document.getElementById(id);
@@ -15,10 +16,23 @@
   show.hidden = false;
   document.body.style.background = '#1E1611';
 
-  const PHASES = ['intro', 'dance', 'brew', 'milk', 'pull', 'serve', 'bow'];
+  const PHASES = ['intro', 'dance', 's1', 's2', 's3', 's4', 'bow'];
   const ENDS = [1000, 3000, 5500, 7500, 12000, 14500, 16500];
-  const cap = phase => t('show.' + phase).split('|');
-  const TEA = ['#C8874E', '#DDA26B'];
+  let drink = D.drink('tehtarik'), R = D.recipe('tehtarik');
+  const capKey = phase => (phase === 'intro' ? 'intro' : R.caps[PHASES.indexOf(phase) - 1]);
+  const cap = phase => t('show.' + capKey(phase)).split('|');
+
+  // Colours for the in-between moments of the glass recipes.
+  const MILO_POWDER = '#5A3420', MILO_DARK = '#4E2C18', SYRUP = '#D63F6E', SYRUP_MILK = '#E36F95';
+  const WATER = ['#DDEBF2', '#BFD8E6'], MILK = ['#FFF4DC', '#F3E6CB'], SYRUP_POUR = ['#C2335F', '#D84B76'];
+  const hex = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
+  function mix(c1, c2, k) {
+    k = Math.max(0, Math.min(1, k));
+    const a = hex(c1), b = hex(c2);
+    return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * k).toString(16).padStart(2, '0')).join('');
+  }
+  const clamp01 = v => Math.max(0, Math.min(1, v));
+  const ramp = (lt, from, to) => clamp01((lt - from) / (to - from));
 
   // Scenery.
   for (let j = 0; j < 16; j++) {
@@ -40,12 +54,7 @@
   }
   const mugA = $('mugA'), mugB = $('mugB');
   const foamA = G.drawMug(mugA.querySelector('svg')), foamB = G.drawMug(mugB.querySelector('svg'));
-  const steps = ['Bancuh', 'Susu', 'Tarik', 'Siap'].map(label => {
-    const s = document.createElement('span');
-    s.textContent = label;
-    $('steps').appendChild(s);
-    return { s, label };
-  });
+  let steps = [];
 
   // Fit the 560 x 660 stage to the screen.
   function fit() {
@@ -99,6 +108,8 @@
         gn.gain.exponentialRampToValueAtTime(0.0001, time + len);
         src.connect(bp); bp.connect(gn); gn.connect(master); src.start(time); src.stop(time + len);
       };
+      // A spoon tapping the glass, and ice dropping in.
+      const clink = (time, vol) => { bell(time, 2093, 0.22, vol); bell(time, 3136, 0.12, vol * 0.5); };
       const N = { C5: 523.25, D5: 587.33, E5: 659.25, G5: 783.99, A5: 880, C6: 1046.5, E6: 1318.5, G6: 1568 };
       const melody = ['E5', 'G5', 'A5', 'G5', 'E5', 'D5', 'C5', 'D5', 'E5', 'G5', 'A5', 'C6', 'A5', 'G5', 'E5', null];
       const basses = [130.81, 98, 110, 98];
@@ -108,7 +119,12 @@
         if (i % 4 === 0) bass(time, basses[(i / 4) % 4]);
       }
       [3.0, 5.5, 7.5, 12.0].forEach(s => { bell(t0 + s, N.C6, 1.4, 0.6); bell(t0 + s + 0.08, N.E6, 1.4, 0.4); });
-      [7.85, 9.35, 10.85].forEach(s => whoosh(t0 + s));
+      const k3 = R.kinds[2], k4 = R.kinds[3];
+      if (k3 === 'pull') [7.85, 9.35, 10.85].forEach(s => whoosh(t0 + s));
+      if (k3 === 'stir') [0, 1.5, 3].forEach(p => [0.3, 0.55, 0.8, 1.05].forEach(s => clink(t0 + 7.5 + p + s, 0.32)));
+      if (k4 === 'iceserve') [0.25, 0.5, 0.75].forEach(s => clink(t0 + 12 + s, 0.5));
+      if (k4 === 'ice' || k4 === 'icetop') [0.55, 0.95, 1.35].forEach(s => clink(t0 + 12 + s, 0.5));
+      if (k4 === 'icetop') ['G5', 'C6', 'E6', 'G6'].forEach((n, j) => bell(t0 + 13.6 + j * 0.06, N[n], 0.9, 0.4));
       ['C5', 'E5', 'G5', 'C6', 'E6', 'G6'].forEach((n, j) => bell(t0 + 14.5 + j * 0.09, N[n], 2.2, 0.55));
     } catch (e) { ctx = null; }
   }
@@ -129,7 +145,11 @@
   }
 
   /* ---------- the show ---------- */
-  let t0 = 0, iv = 0, lastPhase = -1, lastCount = -1, lastPull = -1, done = false;
+  let t0 = 0, iv = 0, lastPhase = -1, lastCount = -1, lastPop = '', done = false;
+  const PROPS = ['big', 'sock', 'can', 'small', 'spoon', 'kettle', 'bottle', 'stir'];
+  // Where props sit when they work over the serving glass instead of the mugs.
+  const AT_GLASS = { spoon: [90, 150], can: [176, 175] };
+  const AT_MUG = { spoon: [10, 205], can: [100, 175] };
 
   function place(m, foamEl, o) {
     m.style.left = o.l + 'px';
@@ -145,14 +165,133 @@
     if (!on) n.classList.remove('on');
   }
   function popText(n, text) { n.textContent = text; n.classList.remove('pop'); void n.offsetWidth; n.classList.add('pop'); }
+  const toggle = (id, cls, on) => $(id).classList.toggle(cls, !!on);
+
+  // The serving glass (110 x 182 at 125, 230; viewBox 0 -30 120 198): the pixel line where
+  // the drink's surface is, so a pour stops right on it.
+  const surface = fill => 230 + (158 - 128 * fill / 100 + 30) * 110 / 120;
+  const RIM = 290;
+  const grains = c => `repeating-linear-gradient(180deg, ${c} 0 4px, transparent 4px 10px)`;
+
+  // One moment of one step: where the mugs are, what is pouring, which props are out,
+  // and what is in the serving glass.
+  function scene(kind, lt) {
+    const tea = [drink.tea, drink.tea2];
+    const sc = { a: { l: 70, t: 330, foam: 0 }, b: { l: 250, t: 330, foam: 0 }, stream: null, props: {}, at: {}, go: {}, glass: null, pop: '' };
+    const park = () => { sc.a = { l: 0, t: 368, foam: 0 }; sc.b = { l: 296, t: 368, foam: 0 }; };
+    // Pours stop at the rim (the stream would otherwise cross the glass's face).
+    const pourTo = (l, t, w, c, fill, isGrains) => ({ l, t, w, h: Math.max(10, Math.min(surface(fill), RIM) - t), c, grains: isGrains });
+    switch (kind) {
+      case 'brew':
+        sc.props.sock = true;
+        if (lt > 500 && lt < 2300) sc.stream = { l: 99, t: 205, w: 6, h: 128, c: drink.id === 'kopio' ? ['#2A170C', '#3D2314'] : ['#6B3A1E', '#8A4E2A'] };
+        break;
+      case 'milk':
+        sc.a.foam = 3;
+        sc.props.can = true; sc.at.can = AT_MUG.can;
+        if (lt > 500 && lt < 1800) sc.stream = { l: 102, t: 222, w: 8, h: 112, c: MILK };
+        break;
+      case 'sugar':
+        sc.props.spoon = true; sc.at.spoon = AT_MUG.spoon; sc.heap = '#FFFFFF';
+        if (lt > 500 && lt < 1700) { sc.go.spoon = true; sc.stream = { l: 96, t: 262, w: 6, h: 82, c: '#FFFFFF', grains: true }; }
+        break;
+      case 'pull': {
+        const pull = Math.min(2, Math.floor(lt / 1500)), loc = lt - pull * 1500;
+        const high = { l: 150, t: 40, r: -40 }, low = { l: 118, t: 330, r: 0 };
+        const fh = 4 + pull * 3, fl = Math.min(12, fh + (loc > 350 ? Math.min(1, (loc - 350) / 1000) * 3 : 0));
+        if (pull % 2 === 0) { sc.a = Object.assign({}, high, { foam: fh }); sc.b = Object.assign({}, low, { foam: fl }); }
+        else { sc.b = Object.assign({}, high, { foam: fh }); sc.a = Object.assign({}, low, { foam: fl }); }
+        if (loc > 350 && loc < 1350) sc.stream = { l: 148, t: 78, w: 7, h: 266, c: tea };
+        sc.pop = `Tarik! ×${pull + 1}`;
+        break;
+      }
+      case 'serve':
+      case 'iceserve': {
+        const ice = kind === 'iceserve';
+        const from = ice ? 850 : 400, to = ice ? 2300 : 2100;
+        sc.a = { l: 20, t: 330, foam: 6 };
+        sc.b = { l: 176, t: 24, r: -40, foam: 12 };
+        if (lt > from && lt < to) sc.stream = { l: 174, t: 62, w: 7, h: 228, c: tea };
+        sc.props.small = true;
+        sc.glass = { fill: ramp(lt, from, to) * 92, tea: drink.tea, foam: drink.foam,
+          ice: ice ? [100, 350, 600].filter(x => lt > x).length : 0 };
+        break;
+      }
+      case 'scoop': {
+        park();
+        const k = ramp(lt, 400, 1000) + ramp(lt, 1300, 1900), fill = k * 6;
+        sc.props.small = true; sc.props.spoon = true; sc.at.spoon = AT_GLASS.spoon; sc.heap = '#7A4A2A';
+        sc.glass = { fill, tea: MILO_POWDER };
+        if ((lt > 400 && lt < 1000) || (lt > 1300 && lt < 1900)) { sc.go.spoon = true; sc.stream = pourTo(177, 207, 7, '#7A4A2A', fill, true); }
+        sc.pop = lt > 1300 ? `${t('show.scoopPop')} ×2` : (lt > 400 ? `${t('show.scoopPop')} ×1` : '');
+        break;
+      }
+      case 'water': {
+        park();
+        const k = ramp(lt, 300, 1750), fill = 12 + k * 68;
+        sc.props.small = true; sc.props.kettle = true;
+        sc.glass = { fill, tea: mix(MILO_POWDER, MILO_DARK, k) };
+        if (lt > 300 && lt < 1800) sc.stream = pourTo(185, 200, 7, WATER, fill);
+        break;
+      }
+      case 'stir': {
+        park();
+        const turn = Math.min(2, Math.floor(lt / 1500)), loc = lt - turn * 1500, k = ramp(lt, 0, 4300);
+        const pink = drink.id === 'bandung';
+        sc.props.small = true; sc.props.stir = true; sc.go.stir = loc > 150 && loc < 1300;
+        sc.glass = { fill: 80, tea: mix(pink ? SYRUP_MILK : MILO_DARK, drink.tea, k),
+          foam: lt > 2800 ? drink.foam : null, swirl: pink ? 1 - k : 0 };
+        sc.pop = `${t('show.stirPop')} ×${turn + 1}`;
+        break;
+      }
+      case 'syrup': {
+        park();
+        const k = ramp(lt, 400, 1900), fill = k * 40;
+        sc.props.small = true; sc.props.bottle = true;
+        sc.glass = { fill, tea: SYRUP };
+        if (lt > 400 && lt < 1950) sc.stream = pourTo(182, 207, 7, SYRUP_POUR, fill);
+        break;
+      }
+      case 'swirl': {
+        park();
+        const k = ramp(lt, 500, 1800), fill = 40 + k * 40;
+        sc.props.small = true; sc.props.can = true; sc.at.can = AT_GLASS.can;
+        sc.glass = { fill, tea: mix(SYRUP, SYRUP_MILK, k), swirl: ramp(lt, 500, 900) };
+        if (lt > 500 && lt < 1850) sc.stream = pourTo(178, 222, 8, MILK, fill);
+        break;
+      }
+      case 'ice':
+      case 'icetop':
+        park();
+        sc.props.small = true;
+        sc.glass = { fill: 80, tea: drink.tea, foam: drink.foam, ice: [500, 900, 1300].filter(x => lt > x).length,
+          mound: kind === 'icetop' && lt > 1600 };
+        if (kind === 'icetop' && lt > 1600) sc.pop = t('show.dino');
+        break;
+    }
+    return sc;
+  }
+
+  function drawGlass(g) {
+    const p = G.teaPolys(g ? g.fill : 0);
+    const foamOn = g && g.foam;
+    $('smallTea').setAttribute('points', p.tea);
+    $('smallFoam').setAttribute('points', foamOn ? p.foam : '0,0 0,0 0,0');
+    $('smallTea').style.fill = g && g.tea ? g.tea : '';
+    $('smallFoam').style.fill = foamOn ? g.foam : '';
+    $('swirl').setAttribute('opacity', g && g.swirl ? g.swirl.toFixed(2) : '0');
+    for (let j = 0; j < 3; j++) toggle('ice' + j, 'in', g && g.ice > j);
+    toggle('smallMound', 'on', g && g.mound);
+  }
 
   function frame() {
-    const t = Date.now() - t0;
-    if (t >= ENDS[ENDS.length - 1]) { finish(); return; }
+    const now = Date.now() - t0;
+    if (now >= ENDS[ENDS.length - 1]) { finish(); return; }
     let i = 0;
-    while (i < PHASES.length - 1 && t >= ENDS[i]) i++;
+    while (i < PHASES.length - 1 && now >= ENDS[i]) i++;
     const phase = PHASES[i];
-    const lt = t - (i === 0 ? 0 : ENDS[i - 1]);
+    const lt = now - (i === 0 ? 0 : ENDS[i - 1]);
+    const step = i >= 2 && i <= 5 ? i - 2 : -1;
 
     if (i !== lastPhase) {
       lastPhase = i;
@@ -164,59 +303,47 @@
       show.classList.toggle('lights', phase === 'intro' || phase === 'dance' || phase === 'bow');
       show.classList.toggle('dancing', phase === 'dance');
       show.classList.toggle('party', phase === 'dance' || phase === 'bow');
-      prop('big', phase === 'intro' || phase === 'dance' || phase === 'bow');
       $('big').classList.toggle('dance', phase === 'dance');
       $('big').classList.toggle('bowing', phase === 'bow');
-      prop('sock', phase === 'brew');
-      prop('can', phase === 'milk');
-      prop('small', phase === 'serve');
-      const order = ['brew', 'milk', 'pull', 'serve'], cur = order.indexOf(phase);
+      toggle('bigMound', 'on', phase === 'bow' && R.kinds[3] === 'icetop');
       steps.forEach((st, j) => {
-        const state = phase === 'bow' || (cur >= 0 && j < cur) ? 'done' : (j === cur ? 'now' : '');
+        const state = phase === 'bow' || (step >= 0 && j < step) ? 'done' : (j === step ? 'now' : '');
         st.s.className = state;
         st.s.textContent = (state === 'done' ? '✓ ' : '') + st.label;
       });
     }
 
     // Countdown during the joget.
-    const count = phase === 'dance' ? Math.max(1, Math.ceil((ENDS[1] - t) / 1000)) : 0;
+    const count = phase === 'dance' ? Math.max(1, Math.ceil((ENDS[1] - now) / 1000)) : 0;
     if (count !== lastCount) { lastCount = count; if (count) popText($('count'), String(count)); else $('count').textContent = ''; }
 
-    // Mugs and streams.
-    let a = { l: 12, t: 300, foam: 0 }, b = { l: 284, t: 300, foam: 0 }, stream = null;
-    if (phase === 'dance' || phase === 'bow') { a.cls = 'dance'; b.cls = 'dance2'; if (phase === 'bow') { a.foam = 10; b.foam = 10; } }
-    if (phase === 'brew' || phase === 'milk') {
-      a = { l: 70, t: 330, foam: phase === 'milk' ? 3 : 0 };
-      b = { l: 250, t: 330, foam: 0 };
-      if (phase === 'brew' && lt > 500 && lt < 2300) stream = { l: 99, t: 205, w: 6, h: 128, c: ['#6B3A1E', '#8A4E2A'] };
-      if (phase === 'milk' && lt > 500 && lt < 1800) stream = { l: 102, t: 222, w: 8, h: 112, c: ['#FFF4DC', '#F3E6CB'] };
+    let sc;
+    if (step >= 0) sc = scene(R.kinds[step], lt);
+    else {
+      sc = { a: { l: 12, t: 300, foam: 0, cls: 'dance' }, b: { l: 284, t: 300, foam: 0, cls: 'dance2' }, stream: null, props: {}, at: {}, go: {}, glass: null, pop: '' };
+      if (phase === 'bow') { sc.a.foam = 10; sc.b.foam = 10; }
     }
-    let pull = -1;
-    if (phase === 'pull') {
-      pull = Math.min(2, Math.floor(lt / 1500));
-      const loc = lt - pull * 1500;
-      const high = { l: 150, t: 40, r: -40 }, low = { l: 118, t: 330, r: 0 };
-      const fh = 4 + pull * 3, fl = Math.min(12, fh + (loc > 350 ? Math.min(1, (loc - 350) / 1000) * 3 : 0));
-      if (pull % 2 === 0) { a = Object.assign({}, high, { foam: fh }); b = Object.assign({}, low, { foam: fl }); }
-      else { b = Object.assign({}, high, { foam: fh }); a = Object.assign({}, low, { foam: fl }); }
-      if (loc > 350 && loc < 1350) stream = { l: 148, t: 78, w: 7, h: 266, c: TEA };
-    }
-    if (pull !== lastPull) { lastPull = pull; if (pull >= 0) popText($('tarikpop'), `Tarik! ×${pull + 1}`); else $('tarikpop').textContent = ''; }
-    if (phase === 'serve') {
-      a = { l: 20, t: 330, foam: 6 };
-      b = { l: 176, t: 24, r: -40, foam: 12 };
-      if (lt > 400 && lt < 2100) stream = { l: 174, t: 62, w: 7, h: 228, c: TEA };
-      const fill = Math.max(0, Math.min(1, (lt - 400) / 1700)) * 92;
-      const p = G.teaPolys(fill);
-      $('smallTea').setAttribute('points', p.tea);
-      $('smallFoam').setAttribute('points', p.foam);
-    }
-    place(mugA, foamA, a);
-    place(mugB, foamB, b);
-    const ss = $('sstream');
-    if (stream) {
+
+    // Props.
+    prop('big', step < 0);
+    for (const id of PROPS) if (id !== 'big') prop(id, !!sc.props[id]);
+    for (const id in sc.at) { $(id).style.left = sc.at[id][0] + 'px'; $(id).style.top = sc.at[id][1] + 'px'; }
+    toggle('spoon', 'go', sc.go.spoon);
+    toggle('stir', 'go', sc.go.stir);
+    if (sc.heap) $('spoonHeap').style.fill = sc.heap;
+    if (sc.glass) drawGlass(sc.glass);
+    else if (!sc.props.small) drawGlass(null);
+
+    // The pop-up word (Tarik! ×2, Kacau! ×3, Dinosaur!).
+    if (sc.pop !== lastPop) { lastPop = sc.pop; if (sc.pop) popText($('tarikpop'), sc.pop); else $('tarikpop').textContent = ''; }
+
+    place(mugA, foamA, sc.a);
+    place(mugB, foamB, sc.b);
+    const ss = $('sstream'), s = sc.stream;
+    if (s) {
       const was = ss.classList.contains('on');
-      Object.assign(ss.style, { left: stream.l + 'px', top: stream.t + 'px', width: stream.w + 'px', height: stream.h + 'px', background: `repeating-linear-gradient(180deg, ${stream.c[0]} 0 10px, ${stream.c[1]} 10px 20px)` });
+      const bg = s.grains ? grains(s.c) : `repeating-linear-gradient(180deg, ${s.c[0]} 0 10px, ${s.c[1]} 10px 20px)`;
+      Object.assign(ss.style, { left: s.l + 'px', top: s.t + 'px', width: s.w + 'px', height: s.h + 'px', background: bg });
       if (!was) ss.classList.add('on');
     } else ss.classList.remove('on');
   }
@@ -234,10 +361,24 @@
   window.addEventListener('keydown', e => { if (e.key === 'Escape') finish(); });
 
   window.ttm.getState().then(s => {
-    lang = (s && s.settings && s.settings.lang) || 'en';
+    const set = (s && s.settings) || {};
+    lang = set.lang || 'en';
+    drink = D.drink(set.drink);
+    R = D.recipe(drink.id);
     document.documentElement.lang = lang;
+    show.style.setProperty('--stea', drink.tea);
+    show.style.setProperty('--sfoam', drink.foam);
+    show.classList.toggle('iced', !!drink.iced);
+    show.classList.toggle('darkdrink', drink.id === 'kopio');
+    $('stain') && ($('stain').style.fill = drink.id === 'kopio' ? '#3D2314' : '');
+    steps = R.steps.map(label => {
+      const el = document.createElement('span');
+      el.textContent = label;
+      $('steps').appendChild(el);
+      return { s: el, label };
+    });
     $('btnSkip').textContent = t('show.skip');
-    setMuted(!!(s && s.settings && s.settings.sound === false));
+    setMuted(set.sound === false);
     t0 = Date.now();
     startMusic();
     frame();

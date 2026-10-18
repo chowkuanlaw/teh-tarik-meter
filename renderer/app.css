@@ -320,7 +320,39 @@ select.pick { height: 36px; border-radius: 10px; border: 1.5px solid var(--dash)
 .biggl.dance { animation: bigpop .45s both, dance 2.4s ease-in-out .45s infinite; transform-origin: 50% 90%; }
 .biggl.bowing { animation: bow 1.4s ease-in-out infinite; transform-origin: 50% 95%; }
 .bsteam path { fill: none; stroke: #B9A595; stroke-width: 2; stroke-linecap: round; }
-#show .teafill { fill: #C8874E; } #show .foamfill { fill: #F3DEC0; }
+#show .teafill { fill: var(--stea, #C8874E); } #show .foamfill { fill: var(--sfoam, #F3DEC0); }
+#show.iced .bsteam { display: none; }
+/* A light face on a dark drink (kopi O), so it stays visible. */
+#show.darkdrink .face .line { stroke: #FFF3E3; } #show.darkdrink .face .mouthfill { fill: #FFF3E3; stroke: #FFF3E3; }
+.icecubes { display: none; } #show.iced .icecubes { display: block; }
+.icecube { fill: rgba(235,248,255,.72); stroke: #3A2A22; stroke-width: 2; }
+.icec { opacity: 0; }
+.icec.in { opacity: 1; animation: icedrop .5s cubic-bezier(.4,0,.6,1) both; }
+.mound { display: none; }
+.mound.on { display: block; animation: bigpop .45s cubic-bezier(.3,1.5,.5,1) both; transform-box: fill-box; transform-origin: 50% 100%; }
+.mound path { fill: #6B3E22; stroke: #3A2A22; stroke-width: 2.4; stroke-linejoin: round; }
+.mound circle { fill: #9A6A44; }
+.swirl { fill: none; stroke: #FFF4EC; stroke-width: 5; stroke-linecap: round; animation: sway 1.2s ease-in-out infinite; }
+.spoon { left: 90px; top: 150px; overflow: visible; }
+.spoon > * { transform: rotate(20deg); transform-origin: 0 20px; }
+.spoon.go > * { animation: tap .32s ease-in-out infinite; }
+.spoonline { fill: none; stroke: #8E9AA3; stroke-width: 5; stroke-linecap: round; }
+.spoonbowl { fill: #C9D1D6; stroke: #3A2A22; stroke-width: 2; }
+.heap { fill: #FFFFFF; stroke: #3A2A22; stroke-width: 1.6; }
+.kettle { left: 180px; top: 170px; overflow: visible; }
+.kettle > * { transform: rotate(-32deg); transform-origin: 10px 29px; }
+.kbody { fill: #D8DEE2; stroke: #3A2A22; stroke-width: 2.4; stroke-linejoin: round; }
+.klid { fill: #B9C2C8; stroke: #3A2A22; stroke-width: 2; }
+.khandle { fill: none; stroke: #3A2A22; stroke-width: 5; stroke-linecap: round; }
+.bottle { left: 161px; top: 201px; overflow: visible; }
+.bottle > * { transform: rotate(135deg); transform-origin: 25px 4px; }
+.bglass { fill: rgba(235,248,255,.6); stroke: #3A2A22; stroke-width: 2.2; }
+.bsyrup { fill: #C2335F; }
+.blabel { fill: #FFF3E3; stroke: #3A2A22; stroke-width: 1.6; }
+.bottle text { fill: #C2335F; font: 800 10px var(--body); }
+.stir { left: 165px; top: 196px; overflow: visible; }
+.stir > * { transform-origin: 15px 0; }
+.stir.go > * { animation: stir .5s ease-in-out infinite; }
 .mouthfill { fill: #3A2A22; stroke: #3A2A22; stroke-width: 2.4; stroke-linejoin: round; }
 .biggl .line, .smallgl .line { stroke-width: 3; }
 .armL, .armRb { fill: none; stroke: #3A2A22; stroke-width: 3; stroke-linecap: round; }
@@ -335,7 +367,7 @@ select.pick { height: 36px; border-radius: 10px; border: 1.5px solid var(--dash)
 .mug.dance2 svg { animation: mugdance .6s ease-in-out infinite reverse; }
 .mug .handle { fill: none; stroke: #3A2A22; stroke-width: 3; }
 .mug .bodym { fill: #C9D1D6; stroke: #3A2A22; stroke-width: 2.4; }
-.mug .foamm { fill: #F3DEC0; stroke: #3A2A22; stroke-width: 1.6; }
+.mug .foamm { fill: var(--sfoam, #F3DEC0); stroke: #3A2A22; stroke-width: 1.6; }
 .mug .e { fill: #3A2A22; }
 .mug .m { fill: none; stroke: #3A2A22; stroke-width: 2; stroke-linecap: round; }
 .tarikpop { position: absolute; left: 6px; top: 20px; font: 800 34px/1 var(--display); color: #F3DEC0; }
@@ -359,6 +391,10 @@ select.pick { height: 36px; border-radius: 10px; border: 1.5px solid var(--dash)
 @keyframes zzz { 0% { transform: translate(0,0); opacity: 0; } 30% { opacity: 1; } 100% { transform: translate(10px,-22px); opacity: 0; } }
 @keyframes pop { 0% { transform: scale(.6); opacity: 0; } 70% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
 @keyframes flow { from { background-position: 0 0; } to { background-position: 0 40px; } }
+@keyframes icedrop { 0% { transform: translateY(-170px); opacity: 0; } 20% { opacity: 1; } 75% { transform: translateY(8px); } 100% { transform: translateY(0); opacity: 1; } }
+@keyframes tap { 0%,100% { transform: rotate(20deg); } 50% { transform: rotate(27deg); } }
+@keyframes stir { 0%,100% { transform: translateX(-16px) rotate(-7deg); } 50% { transform: translateX(16px) rotate(7deg); } }
+@keyframes sway { 0%,100% { transform: translateX(-5px); } 50% { transform: translateX(5px); } }
 @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
 @keyframes flicker { 0%,100% { transform: scale(1,1); } 50% { transform: scale(.9,1.1); } }
 @keyframes jugtilt { 0% { transform: rotate(0deg); } 25%,80% { transform: rotate(-40deg); } 100% { transform: rotate(0deg); } }
