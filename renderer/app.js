@@ -147,6 +147,7 @@
 
   function pageHistory() {
     const out = [h('h1', { text: t('s.tab.history') })];
+    if (st.preview) out.push(h('p', { class: 'small histnote', text: t('s.histSample') }));
     if (!hist) { out.push(h('p', { class: 'small muted', text: '...' })); return out; }
     const L = lang();
     const dayEnd = hist.from + 86400e3;
@@ -181,6 +182,7 @@
       h('button', { class: 'btn', type: 'button', onclick: () => act('open-link', { which: 'privacy' }), text: t('s.privacy') }),
       h('button', { class: 'btn', type: 'button', onclick: () => act('open-link', { which: 'repo' }), text: 'GitHub' })));
     out.push(h('p', { class: 'small muted', text: t('s.saved') }));
+    out.push(h('p', { class: 'small muted legal', text: t('s.legal') }), h('p', { class: 'small muted legal', text: t('s.legalMilo') }));
     return out;
   }
 
@@ -230,7 +232,7 @@
 
   function key() {
     if (!st) return '';
-    return JSON.stringify([tab, welcome, step, st.settings, st.dark, st.status, st.cc, st.orgs, st.orgId, st.update, st.checking, st.shortcutTaken,
+    return JSON.stringify([tab, welcome, step, st.settings, st.dark, st.status, st.preview, st.cc, st.orgs, st.orgId, st.update, st.checking, st.shortcutTaken,
       !!(st.view && st.view.hasData), welcome ? 0 : Math.floor((st.ccAt || 0) / 60e3), histAt]);
   }
 
@@ -261,7 +263,12 @@
     draw();
   }
 
-  window.ttm.onState(s => { st = s; draw(); });
+  window.ttm.onState(s => {
+    const was = st && st.preview;
+    st = s;
+    if (!!s.preview !== !!was && tab === 'history') loadHistory(); // sample history in, or out
+    draw();
+  });
   window.ttm.getState().then(s => {
     st = s;
     if (tab === 'about' && !welcome) act('news-seen');

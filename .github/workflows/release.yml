@@ -32,6 +32,8 @@ jobs:
           if [ "$TAG" != "$VERSION" ]; then
             echo "::error::Tag $TAG does not match package.json version $VERSION"; exit 1
           fi
+      - name: CHANGELOG.md has a section for this version
+        run: node scripts/changelog-section.js "$TAG" > /dev/null
       - name: Automatic tests (usage parsing, live checks, alerts, Claude Code script)
         run: node --test test/*.test.js
 
@@ -109,6 +111,12 @@ jobs:
         run: |
           ls -la out
           {
+            echo "## What's new in ${TAG#v}"
+            echo
+            node scripts/changelog-section.js "$TAG"
+            echo
+            echo "## Install"
+            echo
             cat .github/release-notes.md
             echo
             echo "SHA-256 checksum:"

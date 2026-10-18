@@ -12,6 +12,7 @@ Your Claude usage as a living glass of teh tarik. A small Windows desktop widget
 - **Tray icon that drains too,** with your numbers on hover. Left-click shows or hides the widget; right-click opens the menu.
 - **Burn-rate forecast.** "At this pace: runs out 3:40 PM", or that it lasts till the refill, with an optional alert before you run out.
 - **Settings, history and a welcome.** A settings window (gear on the widget, or the tray menu) with a usage history chart for today and the week.
+- **Peek before you sign in.** "Peek at a sample first" on the signed-out widget shows everything with made-up numbers. Nothing is fetched or saved, and signing in ends it.
 - **Your drink, your look.** Teh tarik, kopi O, Milo ais, teh ais or sirap bandung. Dark mode, Bahasa Melayu, bigger text and a compact strip.
 - **Stays out of the way.** Hides itself in full screen and presentations; Ctrl+Alt+T shows or hides it.
 - **Festive outfits** for Hari Raya, Chinese New Year, Deepavali, Kaamatan, Gawai, Merdeka, Malaysia Day and Christmas.
@@ -41,7 +42,7 @@ Show/hide the widget · Refresh now · Settings · Compact widget · Keep on top
 
 ## Microsoft Store
 
-`npm run dist:store` (on Windows) builds `TehTarikMeter-Store-<version>.appx`, or run the **Store package** workflow. Set the repository variables `STORE_IDENTITY_NAME`, `STORE_PUBLISHER`, `STORE_PUBLISHER_NAME`, `STORE_DISPLAY_NAME` and `STORE_PRODUCT_ID` from Partner Center first. Store review may ask how the app reads claude.ai with your sign-in; point them to PRIVACY.md.
+`npm run dist:store` (on Windows) builds `TehTarikMeter-Store-<version>.appx`, or run the **Store package** workflow. Set the repository variables `STORE_IDENTITY_NAME`, `STORE_PUBLISHER`, `STORE_PUBLISHER_NAME`, `STORE_DISPLAY_NAME` and `STORE_PRODUCT_ID` from Partner Center first. The listing text (English and Bahasa Melayu), screenshots, certification notes and a test list are in [`store/`](store/listing.md). The Store copy keeps the Claude Code bridge in `%USERPROFILE%\.teh-tarik-meter`, because Windows keeps a packaged app's AppData private.
 
 ## Privacy
 
@@ -57,7 +58,11 @@ npm run demo             # fake numbers, no network (TTM_DEMO_SESSION=85, TTM_LA
 npm run dist:installer   # build the Windows installer into dist/installer
 ```
 
-To release, bump `version` in `package.json`, commit, and push a tag `v<version>`. The **Release** workflow tests, builds on Windows, smoke-tests the app and publishes the installer.
+To release, bump `version` in `package.json`, add a `## <version>` section to `CHANGELOG.md`, commit, then either push a tag `v<version>` or run the **Release** workflow from the Actions tab with that tag. It tests, builds on Windows, smoke-tests the app and publishes the installer, with that version's changelog as the release notes.
+
+## Trademarks
+
+Teh Tarik Meter is an independent app. It is not made, endorsed or supported by Anthropic. Claude is a trademark of Anthropic, PBC. Milo is a trademark of Société des Produits Nestlé S.A., used here only as the name of a drink; Teh Tarik Meter is not connected with Nestlé.
 
 ## Licence
 

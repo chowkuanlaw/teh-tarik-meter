@@ -60,6 +60,8 @@
     set('lblNotSigned', t('w.notSigned'));
     set('lblSigninText', t('w.signinText'));
     set('btnSignIn', t('w.signinBtn'));
+    set('btnPeek', t('w.peek'));
+    set('btnPeekExit', t('w.peekExit'));
     set('btnKey', t('w.keyLink'));
     set('lblKey', t('w.keyLabel'));
     set('btnKeySave', t('w.keySave'));
@@ -79,6 +81,7 @@
     const s = st;
     if (!s) return [t('sync.starting'), ''];
     if (s.demo) return [t('sync.demo'), 'warn'];
+    if (s.preview) return [t('sync.preview'), 'warn'];
     if (s.status === 'signed-out') return [t('sync.signedOut'), 'off'];
     if (s.paused) return [t('sync.paused'), 'off'];
     if (s.formatBroken) return [t('sync.format'), 'warn'];
@@ -99,7 +102,9 @@
     const cfg = (s && s.settings) || {};
     const L = lang();
     const drink = D.drink(cfg.drink);
-    const signedOut = !!(s && s.status === 'signed-out');
+    // In the sample preview the real state is still signed out, but we show the sample numbers.
+    const preview = !!(s && s.preview);
+    const signedOut = !!(s && s.status === 'signed-out') && !preview;
     const hasData = !!(v && v.hasData);
 
     // Look: theme, drink, compact, festival.
@@ -115,6 +120,8 @@
     card.classList.toggle('signed-out', signedOut);
     $('numbers').hidden = signedOut;
     $('signin').hidden = !signedOut;
+    $('btnPeekExit').hidden = !preview;
+    card.classList.toggle('preview', preview);
     $('btnTop').setAttribute('aria-pressed', cfg.onTop ? 'true' : 'false');
 
     const sw = v && v.session, ww = v && v.weekly;
@@ -143,6 +150,7 @@
     else if (combo >= 5) line = t('combo.5');
     else if (pokeIdx >= 0 && combo > 0) line = t('poke.' + pokeIdx);
     else if (signedOut) line = t('line.signedOut');
+    else if (preview) line = t('line.preview', dv);
     else if (s && s.formatBroken) line = t('line.format');
     else if (!hasData) line = t('line.starting', dv);
     else if (s.festival && s.festival.daysLeft === 0) line = t('fest.' + s.festival.id);
@@ -198,7 +206,7 @@
     const dot = $('liveDot');
     dot.classList.toggle('off', kind === 'off');
     dot.classList.toggle('warn', kind === 'warn');
-    $('btnRefresh').disabled = signedOut && !(s && s.demo);
+    $('btnRefresh').disabled = (signedOut || preview) && !(s && s.demo);
     const news = s && s.news && s.news.length ? s.news[0] : null;
     $('btnNews').hidden = !news;
     if (news) set('btnNews', t('w.whatsNew', { v: news }));
@@ -233,7 +241,7 @@
     stage.classList.remove('jiggle'); void stage.offsetWidth; stage.classList.add('jiggle');
     clearTimeout(jiggleTimer);
     jiggleTimer = setTimeout(() => stage.classList.remove('jiggle'), 600);
-    if (st && st.status === 'signed-out') return;
+    if (st && st.status === 'signed-out' && !st.preview) return;
     const now = Date.now();
     pokes = pokes.filter(x => now - x < 4000);
     pokes.push(now);
@@ -277,6 +285,8 @@
   $('btnSettings').addEventListener('click', () => window.ttm.act('settings'));
   $('btnNews').addEventListener('click', () => { window.ttm.act('settings', { tab: 'about' }); window.ttm.act('news-seen'); });
   $('btnSignIn').addEventListener('click', () => window.ttm.act('sign-in'));
+  $('btnPeek').addEventListener('click', () => window.ttm.act('peek'));
+  $('btnPeekExit').addEventListener('click', () => window.ttm.act('peek-exit'));
   $('btnKey').addEventListener('click', () => {
     const f = $('keyForm');
     f.hidden = !f.hidden;

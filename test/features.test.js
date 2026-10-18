@@ -119,9 +119,10 @@ test('festive outfits show 4 days before and on the day', () => {
 test("what's new: since the version you last used", () => {
   assert.equal(D.newer('1.10.0', '1.9.0'), true);
   assert.equal(D.newer('1.1.0', '1.1.0'), false);
-  assert.deepEqual(D.newsSince('1.0.0').map(n => n.v), ['1.2.0', '1.1.0']);
-  assert.deepEqual(D.newsSince('1.1.0').map(n => n.v), ['1.2.0']);
-  assert.deepEqual(D.newsSince('1.2.0'), []);
+  const all = D.NEWS.map(n => n.v);
+  assert.deepEqual(D.newsSince('1.0.0').map(n => n.v), all, 'everything since 1.0.0, newest first');
+  assert.deepEqual(D.newsSince('1.1.0').map(n => n.v), all.filter(v => v !== '1.1.0'));
+  assert.deepEqual(D.newsSince(all[0]), [], 'nothing new after the newest');
   const pkg = require('../package.json');
   assert.equal(D.NEWS[0].v, pkg.version, 'the newest news matches package.json');
 });
@@ -134,6 +135,18 @@ test('every English text has a Malay one, with the same placeholders', () => {
   for (const k of Object.keys(en)) assert.equal(ph(ms[k]), ph(en[k]), `placeholders differ in ${k}`);
   for (const n of D.NEWS) for (const k of n.keys) assert.ok(en[k] && ms[k], `news text ${k}`);
   for (const p of ['intro', 'dance', 'brew', 'milk', 'pull', 'serve', 'bow']) assert.equal(I.t('ms', 'show.' + p).split('|').length, 2);
+});
+
+test('the release notes carry this version\'s changelog', () => {
+  const { section } = require('../scripts/changelog-section.js');
+  const pkg = require('../package.json');
+  const log = fs.readFileSync(path.join(__dirname, '..', 'CHANGELOG.md'), 'utf8');
+  assert.ok(section(log, pkg.version), `CHANGELOG.md has a ${pkg.version} section`);
+  const sample = '# Changelog\n\n## 1.10.0 (x)\n\n- ten\n\n## 1.1.0 (y)\n\n- one\n';
+  assert.equal(section(sample, '1.1.0'), '- one');
+  assert.equal(section(sample, '1.10.0'), '- ten');
+  assert.equal(section(sample, '1.1'), null, 'no partial match');
+  assert.equal(section(sample, '2.0.0'), null);
 });
 
 test('every drink has its own easter egg recipe, with captions in both languages', () => {
@@ -177,7 +190,7 @@ test('upgrading from 1.0.0 skips the welcome and shows what is new', () => {
   const s = ST.clean({ orgId: 'aaaaaaaa-1111', last: { at: 5, session: { pct: 3 } } });
   assert.equal(s.welcomed, true);
   assert.equal(s.seenVersion, '1.0.0');
-  assert.deepEqual(D.newsSince(s.seenVersion).map(n => n.v), ['1.2.0', '1.1.0']);
+  assert.deepEqual(D.newsSince(s.seenVersion).map(n => n.v), D.NEWS.map(n => n.v));
 });
 
 test('a broken settings file is restored from the daily backup', () => {

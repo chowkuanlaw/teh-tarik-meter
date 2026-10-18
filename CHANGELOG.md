@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.0 (2026-10-18)
+
+- **Peek at a sample.** When you're signed out, "Peek at a sample first" shows the widget, the forecast and the History tab with made-up numbers. Nothing is fetched or saved, no alerts fire, and signing in (or "Back to sign in") ends it.
+- **Claude Code connection moved to your user folder**, `%USERPROFILE%\.teh-tarik-meter`. The Microsoft Store version runs as a package, and Windows keeps a package's AppData private, so Claude Code couldn't have reached the old place. If you're already connected, the app moves it over by itself the next time it starts, with the same status line. Disconnecting now also deletes the script.
+- **Trademark notes** in Settings › About and the README: Teh Tarik Meter isn't made or endorsed by Anthropic (Claude is Anthropic's trademark), and Milo is a trademark of Nestlé, used only as a drink name.
+- **Release notes now include the changelog** for that version.
+- **Bahasa Melayu touch-ups** across the widget, alerts and the show captions.
+- Microsoft Store listing text, screenshots and certification notes are in the `store` folder.
+
 ## 1.2.0 (2026-10-18)
 
 - **An easter egg for every drink.** Poke the glass 10 times and the show now makes the drink you picked:

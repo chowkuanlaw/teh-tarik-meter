@@ -62,8 +62,11 @@ function run() {
 
   const STATE_FILE = () => path.join(app.getPath('userData'), 'state.json');
   const HISTORY_FILE = () => path.join(app.getPath('userData'), 'history.json');
-  const FEED_FILE = () => path.join(app.getPath('userData'), CC.FEED_NAME);
-  const SCRIPT_DIR = () => path.join(app.getPath('userData'), 'statusline');
+  // The Claude Code bridge lives outside AppData so it also works in the Store copy (see lib/claudecode.js).
+  const BRIDGE_DIR = () => CC.bridgeDir();
+  const FEED_FILE = () => path.join(BRIDGE_DIR(), CC.FEED_NAME);
+  const SCRIPT_DIR = () => path.join(BRIDGE_DIR(), 'statusline');
+  const OLD_SCRIPT_DIR = () => path.join(app.getPath('userData'), 'statusline');
 
   let S = ST.clean(null);
   let HIST = H.empty();
@@ -73,7 +76,8 @@ function run() {
     errors: 0, shapeErrors: 0, formatBroken: false,
     fetching: false, again: false, lastFetchAt: 0, lastChangeAt: 0, warm: false,
     paused: false, fullHidden: false, timer: null, rollTimer: null, ccTimer: null, feedTimer: null,
-    orgs: [], update: null, checking: false, updateMsg: null, shortcutTaken: false, histDirty: false
+    orgs: [], update: null, checking: false, updateMsg: null, shortcutTaken: false, histDirty: false,
+    preview: false, sample: null  // the sample preview (see makeSample)
   };
   let widgetWin = null, appWin = null, loginWin = null, showWin = null, tray = null, quitting = false, saveTimer = null, claudeSes = null, cleanUA = '';
   const L = () => S.lang;
@@ -179,6 +183,7 @@ function run() {
         R.web = snap;
         S.last = snap; save();
         R.status = 'ok'; R.errors = 0; R.shapeErrors = 0; R.formatBroken = false;
+        R.preview = false; R.sample = null; // signed in: real numbers from now on
       } catch (e) {
         if (e.code === 'notfound' && attempt === 0 && S.orgId) { S.orgId = null; attempt++; continue; } // org changed: look it up again
         if (e.code === 'auth') { R.status = 'signed-out'; S.orgId = null; save(); }
@@ -265,7 +270,8 @@ function run() {
   function watchFeed() {
     readFeed();
     try {
-      fs.watch(app.getPath('userData'), (_ev, name) => {
+      fs.mkdirSync(BRIDGE_DIR(), { recursive: true });
+      fs.watch(BRIDGE_DIR(), (_ev, name) => {
         if (name && name !== CC.FEED_NAME) return;
         clearTimeout(R.feedTimer);
         R.feedTimer = setTimeout(readFeed, 150);
@@ -310,9 +316,11 @@ function run() {
   }
 
   function snapshot() {
+    const smp = R.preview ? sample() : null;
     return {
-      view: R.view,
-      fc: R.fc,
+      view: smp ? smp.view : R.view,
+      fc: smp ? smp.fc : R.fc,
+      preview: !!smp,
       status: R.status,
       formatBroken: R.formatBroken,
       fetching: R.fetching,
@@ -337,7 +345,7 @@ function run() {
       updateMsg: R.updateMsg,
       checking: R.checking,
       shortcutTaken: R.shortcutTaken,
-      demo: DEMO
+      demo: DEMO && process.env.TTM_HIDE_DEMO !== '1' // development only: hide the label for store screenshots
     };
   }
   function send(win, ch, data) { if (win && !win.isDestroyed()) win.webContents.send(ch, data); }
@@ -459,6 +467,26 @@ function run() {
     broadcast(); updateTray();
   }
 
+  // 1.0 to 1.2 kept the script in AppData. If Claude Code still points there, quietly move it
+  // to the bridge folder (same runner, same chained status line) and tidy up the old copy.
+  function moveBridge() {
+    if (!S.cc.connected) return;
+    try {
+      const file = CC.settingsPath();
+      const settings = CC.readSettings(file);
+      if (!CC.isOurs(settings.statusLine)) return;
+      // Refresh the scripts every start, so an app update also updates them.
+      CC.installScripts(path.join(__dirname, 'statusline'), SCRIPT_DIR(), S.cc.original);
+      if (!CC.needsMove(settings.statusLine, SCRIPT_DIR())) return;
+      const { settings: next, changed } = CC.moveCommand(settings, SCRIPT_DIR());
+      if (!changed) return;
+      CC.backupOnce(file);
+      CC.writeJsonAtomic(file, next);
+      try { fs.rmSync(OLD_SCRIPT_DIR(), { recursive: true, force: true }); } catch (e) { /* ignore */ }
+      try { fs.rmSync(path.join(app.getPath('userData'), CC.FEED_NAME), { force: true }); } catch (e) { /* ignore */ }
+    } catch (e) { /* leave it as it was; Connect Claude Code again fixes it */ }
+  }
+
   async function disconnectClaudeCode() {
     const file = CC.settingsPath();
     try {
@@ -471,6 +499,8 @@ function run() {
     }
     S.cc = { connected: false, original: null, runner: null };
     R.feed = null;
+    // Claude Code no longer runs our script, so remove it and the last saved numbers.
+    try { fs.rmSync(SCRIPT_DIR(), { recursive: true, force: true }); fs.rmSync(FEED_FILE(), { force: true }); } catch (e) { /* ignore */ }
     save(); update();
   }
 
@@ -744,14 +774,16 @@ function run() {
 
   /* ---------- messages from the windows ---------- */
   ipcMain.handle('get-state', evt => (trusted(evt) ? snapshot() : null));
-  ipcMain.handle('get-history', evt => (trusted(evt) ? H.series(HIST, Date.now()) : null));
+  ipcMain.handle('get-history', evt => (trusted(evt) ? H.series(R.preview ? sample().hist : HIST, Date.now()) : null));
   ipcMain.handle('session-key', (evt, value) => (trusted(evt) ? useSessionKey(value) : { ok: false }));
   ipcMain.on('action', (evt, a) => {
     if (!trusted(evt) || !a || typeof a.type !== 'string') return;
     switch (a.type) {
       case 'refresh': R.errors = 0; refresh('manual'); break;
       case 'hover': soon('hover', 10000); break;
-      case 'sign-in': openLogin(); break;
+      case 'sign-in': setPreview(false); openLogin(); break;
+      case 'peek': setPreview(true); break;
+      case 'peek-exit': setPreview(false); break;
       case 'sign-out': signOut(); break;
       case 'hide': setWidget(false); break;
       case 'menu': if (tray) tray.popUpContextMenu(buildMenu()); else buildMenu().popup(); break;
@@ -796,6 +828,12 @@ function run() {
       await wait(700);
       await shot(widgetWin, 'widget-poked.png');
     }
+    if (process.env.TTM_SNAP_PEEK === '1') {
+      R.status = 'signed-out'; broadcast(); await wait(800); await shot(widgetWin, 'widget-signedout.png');
+      setPreview(true); await wait(1200); await shot(widgetWin, 'widget-peek.png');
+      openApp({ tab: 'history' }); await wait(2500); await shot(appWin, 'app-history-peek.png');
+      openApp({ tab: 'about' }); await wait(1500); await shot(appWin, 'app-about.png');
+    }
     if (process.env.TTM_SNAP_TARIK === '1') { send(widgetWin, 'tarik'); await wait(1200); await shot(widgetWin, 'widget-tarik.png'); }
     if (process.env.TTM_SNAP_APP) {
       for (const tab of process.env.TTM_SNAP_APP.split(',')) {
@@ -814,18 +852,51 @@ function run() {
     app.exit(0);
   }
 
-  // Development only: a plausible day of readings, for previewing the History tab and the forecast.
-  function seedHistory() {
-    const now = Date.now(), reset = now + (2 * 3600 + 15 * 60) * 1000;
-    const cur = Number(process.env.TTM_DEMO_SESSION || 45), wk = Number(process.env.TTM_DEMO_WEEKLY || 18);
-    HIST = H.empty();
-    const mid = new Date(); mid.setHours(0, 0, 0, 0);
+  // A plausible day of readings: for the sample preview, and in development for the History tab.
+  function sampleHistory(now, cur, wk, reset) {
+    const h = H.empty();
+    const mid = new Date(now); mid.setHours(0, 0, 0, 0);
     for (let at = mid.getTime(); at < now - 3600e3; at += 10 * 60e3) {
       const cyc = ((at - mid.getTime()) / (5 * 3600e3)) % 1;
-      HIST.s.push([at, Math.round(cyc * 70), mid.getTime() + Math.ceil((at - mid.getTime() + 1) / (5 * 3600e3)) * 5 * 3600e3]);
+      h.s.push([at, Math.round(cyc * 70), mid.getTime() + Math.ceil((at - mid.getTime() + 1) / (5 * 3600e3)) * 5 * 3600e3]);
     }
-    for (let m = 60; m >= 0; m -= 5) HIST.s.push([now - m * 60e3, Math.max(0, cur - m * 0.5), reset]);
-    for (let d = 7 * 24; d >= 0; d -= 2) HIST.w.push([now - d * 3600e3, Math.round(Math.min(100, 2 + (7 * 24 - d) / (7 * 24) * (wk - 2)) * 10) / 10, now + 3 * 86400e3]);
+    for (let m = 60; m >= 0; m -= 5) h.s.push([now - m * 60e3, Math.max(0, cur - m * 0.5), reset]);
+    for (let d = 7 * 24; d >= 0; d -= 2) h.w.push([now - d * 3600e3, Math.round(Math.min(100, 2 + (7 * 24 - d) / (7 * 24) * (wk - 2)) * 10) / 10, now + 3 * 86400e3]);
+    return h;
+  }
+  function seedHistory() {
+    const now = Date.now();
+    HIST = sampleHistory(now, Number(process.env.TTM_DEMO_SESSION || 45), Number(process.env.TTM_DEMO_WEEKLY || 18), now + (2 * 3600 + 15 * 60) * 1000);
+  }
+
+  /*
+   * Sample preview (1.3.0): "Peek at a sample" on the signed-out widget shows made-up numbers,
+   * so new users (and the Microsoft Store testers, who have no Claude account) can see what
+   * the meter does. It only changes what the windows are shown: nothing is fetched or saved,
+   * no alerts fire, and the real state stays signed out. Signing in, or Back, ends it.
+   */
+  function makeSample(now) {
+    const reset = now + (2 * 3600 + 15 * 60) * 1000, week = now + 3 * 86400e3 + 5 * 3600e3;
+    const iso = ms => new Date(ms).toISOString();
+    const p = U.parseUsage({
+      five_hour: { utilization: 38, resets_at: iso(reset) },
+      seven_day: { utilization: 22, resets_at: iso(week) },
+      seven_day_opus: { utilization: 30, resets_at: iso(week) }
+    });
+    const view = M.buildView({ at: now, session: p.session, weekly: p.weekly, models: p.models, extra: p.extra }, null, now);
+    const hist = sampleHistory(now, 38, 22, reset);
+    return { at: now, view, fc: H.forecasts(hist, view, now), hist };
+  }
+  function sample() {
+    if (!R.sample || Date.now() - R.sample.at > 10 * 60e3) R.sample = makeSample(Date.now());
+    return R.sample;
+  }
+  function setPreview(on) {
+    on = !!on && R.status === 'signed-out';
+    if (on === R.preview) return;
+    R.preview = on;
+    if (!on) R.sample = null;
+    broadcast();
   }
 
   app.whenReady().then(() => {
@@ -863,6 +934,7 @@ function run() {
     createTray();
     applyAutostart();
     applyShortcut();
+    moveBridge();
     watchFeed();
     if (!S.welcomed) openApp({ welcome: '1' });
     if (loaded.restored) setTimeout(() => toast(t('n.backup.title'), t('n.backup.body')), 3000);

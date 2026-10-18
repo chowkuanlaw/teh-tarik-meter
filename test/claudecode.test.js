@@ -59,6 +59,33 @@ test('settings path follows CLAUDE_CONFIG_DIR', () => {
   assert.equal(CC.settingsPath({}), path.join(os.homedir(), '.claude', 'settings.json'));
 });
 
+test('the bridge folder is in the user profile, outside AppData (works in the Store copy)', () => {
+  const dir = CC.bridgeDir('C:\\Users\\me');
+  assert.equal(path.basename(dir), '.teh-tarik-meter');
+  assert.ok(!/appdata/i.test(dir));
+  assert.equal(CC.bridgeDir(), path.join(os.homedir(), '.teh-tarik-meter'));
+});
+
+test('an older connection in AppData is moved to the bridge folder, same runner, other settings kept', () => {
+  const oldDir = 'C:\\Users\\me\\AppData\\Roaming\\Teh Tarik Meter\\statusline';
+  const newDir = 'C:\\Users\\me\\.teh-tarik-meter\\statusline';
+  for (const runner of ['node', 'powershell']) {
+    const before = { model: 'opus', statusLine: { type: 'command', command: CC.buildCommand(runner, oldDir), padding: 2 } };
+    assert.equal(CC.needsMove(before.statusLine, newDir), true);
+    assert.equal(CC.runnerOf(before.statusLine), runner);
+    const { settings, changed } = CC.moveCommand(before, newDir);
+    assert.equal(changed, true);
+    assert.equal(settings.statusLine.command, CC.buildCommand(runner, newDir));
+    assert.equal(settings.statusLine.padding, 2);
+    assert.equal(settings.model, 'opus');
+    assert.equal(CC.needsMove(settings.statusLine, newDir), false, 'moved once only');
+  }
+  // Someone else's status line is never touched.
+  const theirs = { statusLine: { type: 'command', command: 'echo hi' } };
+  assert.equal(CC.needsMove(theirs.statusLine, newDir), false);
+  assert.deepEqual(CC.moveCommand(theirs, newDir), { settings: theirs, changed: false });
+});
+
 function setup(original) {
   const app = fs.mkdtempSync(path.join(os.tmpdir(), 'ttm-app-'));
   const dir = path.join(app, 'statusline');

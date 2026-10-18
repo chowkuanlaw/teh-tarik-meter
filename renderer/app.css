@@ -266,6 +266,8 @@ select.pick { height: 36px; border-radius: 10px; border: 1.5px solid var(--dash)
 .welcome h1 { margin: 0; font: 800 26px var(--display); }
 .welcome p { margin: 0; font: 600 15px/1.5 var(--body); color: var(--muted); }
 .welcome .ok { color: var(--green); font: 800 15px var(--body); }
+.histnote { font-weight: 800; color: var(--accent); }
+.legal { margin-top: 6px; }
 .dots { display: flex; gap: 6px; }
 .dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--dash); }
 .dots i.on { background: var(--accent); width: 22px; border-radius: 4px; }

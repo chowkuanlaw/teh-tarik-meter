@@ -63,6 +63,7 @@
 
   /* ---------- what's new ---------- */
   const NEWS = [
+    { v: '1.3.0', keys: ['news.1.3.0.a', 'news.1.3.0.b'] },
     { v: '1.2.0', keys: ['news.1.2.0.a'] },
     { v: '1.1.0', keys: ['news.1.1.0.a', 'news.1.1.0.b', 'news.1.1.0.c', 'news.1.1.0.d', 'news.1.1.0.e'] }
   ];
