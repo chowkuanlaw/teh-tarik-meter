@@ -7,7 +7,9 @@
  */
 (function () {
   if (!window.ttm || window.ttm.view !== 'show') return;
-  const G = window.TTGlass;
+  const G = window.TTGlass, I = window.TTI18n;
+  let lang = 'en';
+  const t = k => I.t(lang, k);
   const $ = id => document.getElementById(id);
   const show = $('show');
   show.hidden = false;
@@ -15,15 +17,7 @@
 
   const PHASES = ['intro', 'dance', 'brew', 'milk', 'pull', 'serve', 'bow'];
   const ENDS = [1000, 3000, 5500, 7500, 12000, 14500, 16500];
-  const CAPS = {
-    intro: ['Ten pokes?! OK lah...', 'SHOWTIME!'],
-    dance: ['Quick joget!', 'Two seconds only, then we make teh'],
-    brew: ['Step 1 · Bancuh teh', 'Okay, enough joget. Strong tea through the kain saring'],
-    milk: ['Step 2 · Susu pekat', 'A generous pour of condensed milk'],
-    pull: ['Step 3 · Tarik! Tarik! Tarik!', 'Pull high for that thick foam'],
-    serve: ['Step 4 · Siap!', 'Into the glass, foam on top'],
-    bow: ['Teh tarik kaw, siap!', 'Terima kasih. Back to work lah.']
-  };
+  const cap = phase => t('show.' + phase).split('|');
   const TEA = ['#C8874E', '#DDA26B'];
 
   // Scenery.
@@ -120,7 +114,7 @@
   }
   function setMuted(m) {
     muted = m;
-    $('soundLabel').textContent = m ? 'Sound off' : 'Sound on';
+    $('soundLabel').textContent = t(m ? 'show.soundOff' : 'show.soundOn');
     $('soundWaves').setAttribute('d', m ? 'M17 9l5 6M22 9l-5 6' : 'M16.5 8.5a5 5 0 0 1 0 7M19.5 5.5a9 9 0 0 1 0 13');
     $('btnSound').setAttribute('aria-pressed', String(m));
     if (ctx && master) {
@@ -162,10 +156,11 @@
 
     if (i !== lastPhase) {
       lastPhase = i;
-      $('capTitle').textContent = CAPS[phase][0];
-      $('capSub').textContent = CAPS[phase][1];
-      const cap = $('caption').firstElementChild;
-      cap.classList.remove('pop'); void cap.offsetWidth; cap.classList.add('pop');
+      const [c1, c2] = cap(phase);
+      $('capTitle').textContent = c1;
+      $('capSub').textContent = c2 || '';
+      const capEl = $('caption').firstElementChild;
+      capEl.classList.remove('pop'); void capEl.offsetWidth; capEl.classList.add('pop');
       show.classList.toggle('lights', phase === 'intro' || phase === 'dance' || phase === 'bow');
       show.classList.toggle('dancing', phase === 'dance');
       show.classList.toggle('party', phase === 'dance' || phase === 'bow');
@@ -239,7 +234,10 @@
   window.addEventListener('keydown', e => { if (e.key === 'Escape') finish(); });
 
   window.ttm.getState().then(s => {
-    setMuted(!!(s && s.sound === false));
+    lang = (s && s.settings && s.settings.lang) || 'en';
+    document.documentElement.lang = lang;
+    $('btnSkip').textContent = t('show.skip');
+    setMuted(!!(s && s.settings && s.settings.sound === false));
     t0 = Date.now();
     startMusic();
     frame();

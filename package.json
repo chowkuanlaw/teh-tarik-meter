@@ -1,7 +1,7 @@
 {
   "name": "teh-tarik-meter",
   "productName": "Teh Tarik Meter",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Your Claude usage as a living glass of teh tarik: a cute Windows desktop widget with live session and weekly limits",
   "main": "main.js",
   "license": "MIT",
@@ -15,10 +15,12 @@
     "start": "electron .",
     "demo": "cross-env TTM_DEMO=1 electron .",
     "dist:installer": "electron-builder --win nsis --x64 --publish never",
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "dist:store": "electron-builder --win appx --x64 --publish never"
   },
   "dependencies": {
-    "electron-updater": "6.8.10"
+    "electron-updater": "6.8.10",
+    "koffi": "3.3.2"
   },
   "devDependencies": {
     "cross-env": "7.0.3",
@@ -28,7 +30,10 @@
   "build": {
     "appId": "app.tehtarik.meter",
     "productName": "Teh Tarik Meter",
-    "electronLanguages": ["en-US"],
+    "electronLanguages": [
+      "en-US",
+      "ms"
+    ],
     "copyright": "Copyright (c) 2026 chowkuanlaw",
     "directories": {
       "output": "dist/installer",
@@ -62,7 +67,9 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "assets/icon.ico",
@@ -77,7 +84,8 @@
       "createStartMenuShortcut": true,
       "shortcutName": "Teh Tarik Meter",
       "deleteAppDataOnUninstall": false,
-      "artifactName": "TehTarikMeter-Setup-${version}.${ext}"
+      "artifactName": "TehTarikMeter-Setup-${version}.${ext}",
+      "include": "installer/uninstall.nsh"
     },
     "publish": [
       {
@@ -86,6 +94,20 @@
         "repo": "teh-tarik-meter",
         "releaseType": "release"
       }
-    ]
+    ],
+    "appx": {
+      "identityName": "PLACEHOLDER.TehTarikMeter",
+      "publisher": "CN=00000000-0000-0000-0000-000000000000",
+      "publisherDisplayName": "PLACEHOLDER",
+      "applicationId": "TehTarikMeter",
+      "displayName": "Teh Tarik Meter",
+      "backgroundColor": "#FFF8F0",
+      "languages": [
+        "en-US",
+        "ms-MY"
+      ],
+      "addAutoLaunchExtension": true,
+      "artifactName": "TehTarikMeter-Store-${version}.${ext}"
+    }
   }
 }

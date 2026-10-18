@@ -2,7 +2,7 @@
 /* The desktop widget: draws what the main process sends, plus the glass's own life (pokes, moods, refills). */
 (function () {
   if (!window.ttm || window.ttm.view !== 'widget') return;
-  const F = window.TTFormat, G = window.TTGlass;
+  const F = window.TTFormat, G = window.TTGlass, D = window.TTData, I = window.TTI18n;
   const $ = id => document.getElementById(id);
   $('widget').hidden = false;
 
@@ -11,7 +11,12 @@
   let pokes = [], pokeIdx = -1, combo = 0, comboTimer = 0, jiggleTimer = 0;
   let msg = null, msgUntil = 0;
   let pouring = false, holdTea = null, pourTimer = 0;
-  let shownLine = '', trayKey = '', lastTea = null;
+  let shownLine = '', trayKey = '', lastTea = null, lastLang = null, lastDrink = null;
+
+  const lang = () => (st && st.settings && st.settings.lang) || 'en';
+  const t = (k, v) => I.t(lang(), k, v);
+  const set = (id, text) => { const n = $(id); if (n.textContent !== text) n.textContent = text; };
+  const label = (id, text) => { const n = $(id); n.setAttribute('aria-label', text); n.title = text; };
 
   // Weekly cups.
   const cups = [];
@@ -37,8 +42,7 @@
     const f = G.FACES[mood] || G.FACES.happy;
     const eyes = $('eyes');
     eyes.setAttribute('d', f.eyes);
-    eyes.setAttribute('fill', f.eyesFilled ? '#3A2A22' : 'none');
-    eyes.style.stroke = f.eyesFilled ? 'none' : '';
+    eyes.classList.toggle('filled', f.eyesFilled);
     $('brows').setAttribute('d', f.brows);
     $('mouth').setAttribute('d', f.mouth);
     $('mouth').classList.toggle('filled', f.mouthFilled);
@@ -48,33 +52,70 @@
     stage.dataset.mood = mood;
   }
 
+  // Words that don't change with the numbers.
+  function staticText() {
+    set('lblSession', t('w.session'));
+    set('lblLeftIn', t('w.leftInGlass'));
+    set('lblWeek', t('w.week'));
+    set('lblNotSigned', t('w.notSigned'));
+    set('lblSigninText', t('w.signinText'));
+    set('btnSignIn', t('w.signinBtn'));
+    set('btnKey', t('w.keyLink'));
+    set('lblKey', t('w.keyLabel'));
+    set('btnKeySave', t('w.keySave'));
+    set('btnRefresh', t('w.refresh'));
+    label('btnTop', t('a.top'));
+    label('btnCompact', t('a.compact'));
+    label('btnSettings', t('a.settings'));
+    label('btnHide', t('a.hide'));
+    label('btnHide2', t('a.hide'));
+    label('btnExpand', t('a.expand'));
+    label('stage', t('a.poke'));
+    label('miniGlass', t('a.poke'));
+    document.documentElement.lang = lang();
+  }
+
   function syncText(now) {
     const s = st;
-    if (!s) return ['Starting...', ''];
-    if (s.demo) return ['Demo numbers (development)', 'warn'];
-    if (s.status === 'signed-out') return ['Not signed in', 'off'];
-    if (s.paused) return ['Paused while your PC is locked', 'off'];
-    if (s.fetching && !(s.view && s.view.syncedAt)) return ['Syncing...', ''];
+    if (!s) return [t('sync.starting'), ''];
+    if (s.demo) return [t('sync.demo'), 'warn'];
+    if (s.status === 'signed-out') return [t('sync.signedOut'), 'off'];
+    if (s.paused) return [t('sync.paused'), 'off'];
+    if (s.formatBroken) return [t('sync.format'), 'warn'];
     const have = !!(s.view && s.view.hasData);
-    if (s.status === 'offline') return [have ? 'Offline · showing last reading' : 'Offline · will retry', 'warn'];
-    if (s.status === 'error') return [have ? "Couldn't reach claude.ai · showing last reading" : "Couldn't reach claude.ai · retrying", 'warn'];
-    if (s.fetching) return ['Syncing...', ''];
+    if (s.fetching && !(s.view && s.view.syncedAt)) return [t('sync.syncing'), ''];
+    if (s.status === 'offline') return [t(have ? 'sync.offlineLast' : 'sync.offline'), 'warn'];
+    if (s.status === 'error') return [t(have ? 'sync.errorLast' : 'sync.error'), 'warn'];
+    if (s.fetching) return [t('sync.syncing'), ''];
     const at = s.view && s.view.syncedAt;
-    if (!at) return ['Starting...', ''];
-    const via = s.view.source === 'cc' ? ' via Claude Code' : '';
-    return [`Live · synced ${F.ago(now - at)}${via}`, ''];
+    if (!at) return [t('sync.starting'), ''];
+    return [t('sync.live', { ago: F.ago(now - at, lang()) }) + (s.view.source === 'cc' ? t('sync.via') : ''), ''];
   }
 
   function render() {
     const now = Date.now();
     const s = st;
     const v = s && s.view;
+    const cfg = (s && s.settings) || {};
+    const L = lang();
+    const drink = D.drink(cfg.drink);
     const signedOut = !!(s && s.status === 'signed-out');
     const hasData = !!(v && v.hasData);
+
+    // Look: theme, drink, compact, festival.
+    document.body.classList.toggle('dark', !!(s && s.dark));
+    if (drink.id !== lastDrink) { G.applyDrink(drink); lastDrink = drink.id; trayKey = ''; }
+    if (L !== lastLang) { lastLang = L; staticText(); shownLine = ''; }
+    stage.classList.toggle('iced', drink.iced);
+    card.classList.toggle('compact', !!cfg.compact);
+    const fest = s && s.festival ? s.festival.id : '';
+    if ((stage.dataset.fest || '') !== fest) stage.dataset.fest = fest;
+    stage.classList.toggle('hat', fest === 'raya' || fest === 'xmas');
+
     card.classList.toggle('signed-out', signedOut);
     $('numbers').hidden = signedOut;
     $('signin').hidden = !signedOut;
-    $('btnTop').setAttribute('aria-pressed', s && s.onTop ? 'true' : 'false');
+    $('btnTop').setAttribute('aria-pressed', cfg.onTop ? 'true' : 'false');
 
     const sw = v && v.session, ww = v && v.weekly;
     const sPct = sw ? sw.pct : (hasData ? 0 : null);
@@ -89,66 +130,101 @@
     stage.classList.toggle('pouring', pouring);
 
     // Mood and words.
+    const fc = (s && s.fc) || {};
     const worst = Math.max(sPct || 0, wPct || 0);
-    let mood = signedOut ? 'asleep' : (pouring ? 'excited' : (hasData ? F.mood(worst) : 'happy'));
+    const mood = signedOut ? 'asleep' : (pouring ? 'excited' : (hasData ? F.mood(worst) : 'happy'));
     setFace(mood);
+    const dv = { drink: drink.say, Drink: drink.name };
     let line;
-    if (pouring) line = G.LINES.excited;
+    if (pouring) line = t('line.excited', dv);
     else if (msg && now < msgUntil) line = msg;
-    else if (G.comboLine(combo)) line = G.comboLine(combo);
-    else if (pokeIdx >= 0 && combo > 0) line = G.POKES[pokeIdx];
-    else if (signedOut) line = G.LINES.signedOut;
-    else if (!hasData) line = G.LINES.starting;
-    else if (sw && sw.fresh && (wPct || 0) < 80) line = G.LINES.fresh;
-    else if ((wPct || 0) >= 80 && (sPct || 0) < 80) line = G.LINES.weeklyLow;
-    else line = G.LINES[mood];
+    else if (combo >= 9) line = t('combo.9');
+    else if (combo >= 7) line = t('combo.7');
+    else if (combo >= 5) line = t('combo.5');
+    else if (pokeIdx >= 0 && combo > 0) line = t('poke.' + pokeIdx);
+    else if (signedOut) line = t('line.signedOut');
+    else if (s && s.formatBroken) line = t('line.format');
+    else if (!hasData) line = t('line.starting', dv);
+    else if (s.festival && s.festival.daysLeft === 0) line = t('fest.' + s.festival.id);
+    else if (sw && sw.fresh && (wPct || 0) < 80) line = t('line.fresh');
+    else if ((wPct || 0) >= 80 && (sPct || 0) < 80) line = t('line.weeklyLow');
+    else if (fc.session && fc.session.beforeReset && (sPct || 0) < 80) line = t('line.pace');
+    else line = t('line.' + mood);
     setLine(line);
 
-    // Numbers.
-    $('sLeft').textContent = sLeft === null ? '--' : `${sLeft}%`;
+    // Session numbers.
+    set('sLeft', sLeft === null ? '--' : `${sLeft}%`);
     let sub = '';
-    if (pouring) sub = 'Refilling...';
+    if (pouring) sub = t('w.refilling');
     else if (!hasData) sub = '';
-    else if (!sw || sw.fresh || !sw.resetsAt) sub = 'Fresh glass · starts when you chat';
-    else sub = `${sw.pct >= 100 ? 'Habis! ' : ''}Next teh tarik in ${F.countdown(sw.resetsAt - now, true)}`;
-    $('sSub').textContent = sub;
+    else if (!sw || sw.fresh || !sw.resetsAt) sub = t('w.freshGlass');
+    else sub = (sw.pct >= 100 ? t('w.habis') : '') + t('w.nextIn', Object.assign({ t: F.countdown(sw.resetsAt - now, true, L) }, dv));
+    set('sSub', sub);
+    const pace = $('pace');
+    if (hasData && !pouring && fc.session && sw && !sw.fresh) {
+      pace.hidden = false;
+      pace.classList.toggle('warn', fc.session.beforeReset);
+      set('pace', fc.session.beforeReset ? t('w.paceOut', { when: F.at(fc.session.eta, now, L) }) : t('w.paceOk'));
+    } else pace.hidden = true;
 
+    // The week.
     const wLeft = wPct === null ? null : Math.max(0, Math.round(100 - wPct));
-    $('wLeft').textContent = wLeft === null ? '--' : `${wLeft}% left`;
+    set('wLeft', wLeft === null ? '--' : t('w.left', { p: wLeft }));
     for (let i = 0; i < 7; i++) {
       const fr = wLeft === null ? 0 : Math.max(0, Math.min(1, wLeft * 7 / 100 - i));
-      const awake = G.setCup(cups[i].parts, fr);
-      cups[i].svg.classList.toggle('awake', awake);
+      cups[i].svg.classList.toggle('awake', G.setCup(cups[i].parts, fr));
     }
     let wsub = '';
     if (ww) {
-      if (ww.fresh || !ww.resetsAt) wsub = 'Full pot · starts when you chat';
-      else wsub = `${ww.pct >= 100 ? 'All cups empty · ' : ''}Fresh pot ${F.when(ww.resetsAt, now)}`;
+      if (ww.fresh || !ww.resetsAt) wsub = t('w.fullPot');
+      else {
+        wsub = (ww.pct >= 100 ? t('w.allEmpty') : '') + t('w.freshPot', { when: F.when(ww.resetsAt, now, L) });
+        if (fc.weekly && fc.weekly.beforeReset && ww.pct < 100) wsub += ' · ' + t('w.weekPaceOut', { when: F.at(fc.weekly.eta, now, L) });
+      }
     }
-    $('wSub').textContent = wsub;
+    set('wSub', wsub);
     const models = (v && v.models || []).filter(m => m && m.pct !== null && m.pct !== undefined);
     $('models').hidden = !models.length;
-    $('models').textContent = models.length ? 'Also: ' + models.map(m => `${m.name} ${Math.max(0, Math.round(100 - m.pct))}% left`).join(' · ') : '';
+    set('models', models.length ? t('w.also') + models.map(m => t('w.modelLeft', { name: m.name, p: Math.max(0, Math.round(100 - m.pct)) })).join(' · ') : '');
+    const ex = v && v.extra;
+    $('extra').hidden = !ex;
+    set('extra', ex ? t('w.extra', { used: F.money(ex.used, ex.currency, L), limit: F.money(ex.limit, ex.currency, L) }) : '');
 
-    // Sync line and live dot.
+    // Footer.
     const [text, kind] = syncText(now);
     const sy = $('sync');
-    sy.textContent = text;
+    if (sy.textContent !== text) sy.textContent = text;
     sy.className = 'sync' + (kind ? ' ' + kind : '');
     const dot = $('liveDot');
     dot.classList.toggle('off', kind === 'off');
     dot.classList.toggle('warn', kind === 'warn');
     $('btnRefresh').disabled = signedOut && !(s && s.demo);
+    const news = s && s.news && s.news.length ? s.news[0] : null;
+    $('btnNews').hidden = !news;
+    if (news) set('btnNews', t('w.whatsNew', { v: news }));
+
+    // Compact strip.
+    const p = G.teaPolys(signedOut || sLeft === null ? 0 : sLeft * 0.9);
+    $('miniTea').setAttribute('points', p.tea);
+    $('miniFoam').setAttribute('points', p.foam);
+    $('miniEyes').setAttribute('d', mood === 'asleep' ? 'M42 96 H56 M64 96 H78' : G.MINI_EYES);
+    $('miniEyes').style.stroke = mood === 'asleep' ? 'var(--ink)' : 'none';
+    $('miniEyes').style.strokeWidth = '5';
+    set('miniLeft', signedOut ? t('w.notSigned') : (sLeft === null ? '--' : t('w.compactLeft', { p: sLeft })));
+    const miniParts = [];
+    if (!signedOut && sw && !sw.fresh && sw.resetsAt) miniParts.push(F.countdown(sw.resetsAt - now, false, L));
+    if (!signedOut && wLeft !== null) miniParts.push(t('w.compactWeek', { p: wLeft }));
+    set('miniSub', miniParts.join(' · '));
 
     // Combo badge.
     const cb = $('combo');
-    if (combo >= 3) { cb.textContent = `×${combo}`; } else cb.classList.remove('on');
+    if (combo >= 3) cb.textContent = `×${combo}`; else cb.classList.remove('on');
 
-    // Tray icon follows the tea level.
-    const key = `${signedOut || !hasData ? 'x' : Math.round(sLeft / 5)}`;
+    // Tray icon follows the level.
+    const key = `${signedOut || !hasData ? 'x' : Math.round(sLeft / 5)}:${drink.id}:${s && s.dark ? 1 : 0}`;
     if (key !== trayKey) {
       trayKey = key;
-      try { window.ttm.act('tray-icon', { images: G.trayIcons(sLeft === null ? 0 : sLeft, signedOut || !hasData) }); } catch (e) { /* ignore */ }
+      try { window.ttm.act('tray-icon', { images: G.trayIcons(sLeft === null ? 0 : sLeft, signedOut || !hasData, drink, s && s.dark) }); } catch (e) { /* ignore */ }
     }
   }
 
@@ -159,16 +235,16 @@
     jiggleTimer = setTimeout(() => stage.classList.remove('jiggle'), 600);
     if (st && st.status === 'signed-out') return;
     const now = Date.now();
-    pokes = pokes.filter(t => now - t < 4000);
+    pokes = pokes.filter(x => now - x < 4000);
     pokes.push(now);
     if (pokes.length >= 10) {
       pokes = []; combo = 0; pokeIdx = -1;
-      say('Okay lah... SHOWTIME!', 4000);
+      say(t('line.showtime'), 4000);
       window.ttm.act('start-show');
       return;
     }
     combo = pokes.length;
-    pokeIdx = (pokeIdx + 1) % G.POKES.length;
+    pokeIdx = (pokeIdx + 1) % 4;
     msg = null;
     const cb = $('combo');
     if (combo >= 3) { cb.classList.remove('on'); void cb.offsetWidth; cb.classList.add('on'); }
@@ -177,7 +253,7 @@
     render();
   }
 
-  // The session refilled: a pulling mug pours fresh teh tarik into the glass.
+  // The session refilled: a pulling mug pours a fresh drink into the glass.
   function playTarik() {
     if (pouring) return;
     holdTea = lastTea;
@@ -190,10 +266,16 @@
 
   stage.addEventListener('click', poke);
   card.addEventListener('mouseenter', () => window.ttm.act('hover'));
+  card.addEventListener('contextmenu', e => { e.preventDefault(); window.ttm.act('menu'); });
   $('btnRefresh').addEventListener('click', () => window.ttm.act('refresh'));
   $('btnHide').addEventListener('click', () => window.ttm.act('hide'));
-  $('btnTop').addEventListener('click', () => window.ttm.act('on-top'));
-  $('btnMenu').addEventListener('click', () => window.ttm.act('menu'));
+  $('btnHide2').addEventListener('click', () => window.ttm.act('hide'));
+  $('btnTop').addEventListener('click', () => window.ttm.act('set', { key: 'onTop', value: !(st && st.settings && st.settings.onTop) }));
+  $('btnCompact').addEventListener('click', () => window.ttm.act('set', { key: 'compact', value: true }));
+  $('btnExpand').addEventListener('click', () => window.ttm.act('set', { key: 'compact', value: false }));
+  $('miniGlass').addEventListener('dblclick', () => window.ttm.act('set', { key: 'compact', value: false }));
+  $('btnSettings').addEventListener('click', () => window.ttm.act('settings'));
+  $('btnNews').addEventListener('click', () => { window.ttm.act('settings', { tab: 'about' }); window.ttm.act('news-seen'); });
   $('btnSignIn').addEventListener('click', () => window.ttm.act('sign-in'));
   $('btnKey').addEventListener('click', () => {
     const f = $('keyForm');
@@ -204,22 +286,23 @@
   $('keyForm').addEventListener('submit', async e => {
     e.preventDefault();
     const input = $('keyInput');
-    $('keyMsg').textContent = 'Checking...';
+    $('keyMsg').textContent = t('w.keyChecking');
     const r = await window.ttm.sessionKey(input.value);
     input.value = '';
-    $('keyMsg').textContent = r && r.ok ? 'Signed in!' : ((r && r.msg) || "That didn't work.");
+    $('keyMsg').textContent = r && r.ok ? t('w.keyOk') : ((r && r.msg) || t('w.keyFail'));
   });
 
-  // Keep the window just as tall as the card, so its empty corners don't block clicks underneath.
-  let lastH = 0;
+  // Keep the window just as big as the card, so its empty corners don't block clicks underneath.
+  let lastW = 0, lastH = 0;
   new ResizeObserver(() => {
-    const h = Math.ceil(card.getBoundingClientRect().height) + 26;
-    if (Math.abs(h - lastH) > 1) { lastH = h; window.ttm.act('size', { h }); }
+    const r = card.getBoundingClientRect();
+    const w = Math.ceil(r.width) + 20, h = Math.ceil(r.height) + 26;
+    if (Math.abs(w - lastW) > 1 || Math.abs(h - lastH) > 1) { lastW = w; lastH = h; window.ttm.act('size', { w, h }); }
   }).observe(card);
 
   window.ttm.onState(s => { st = s; render(); });
   window.ttm.onTarik(playTarik);
-  window.ttm.onShowOver(() => say('Show over! Back to work lah.', 8000));
+  window.ttm.onShowOver(() => say(t('line.showOver'), 8000));
   window.ttm.getState().then(s => { if (s) { st = s; render(); } });
   setInterval(render, 1000);
   render();

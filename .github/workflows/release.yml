@@ -65,6 +65,12 @@ jobs:
           if ($feed -notmatch '"used_percentage":40') { throw "feed missing numbers: $feed" }
       - name: Build the installer
         run: npx electron-builder --win nsis --x64 --publish never
+      - name: Native helper for the full-screen check is unpacked next to the app
+        shell: pwsh
+        run: |
+          $f = "dist/installer/win-unpacked/resources/app.asar.unpacked/node_modules/@koromix/koffi-win32-x64/win32_x64/koffi.node"
+          if (-not (Test-Path $f)) { throw "koffi.node missing from the installer build" }
+          Write-Host "Found $f"
       - name: Smoke test (the packaged app starts and keeps running)
         shell: pwsh
         run: |

@@ -10,6 +10,12 @@ Your Claude usage as a living glass of teh tarik. A small Windows desktop widget
 - **A real tarik at reset.** When your session refills, a pulling mug pours fresh teh tarik into the glass.
 - **Alerts** at 80% and 95% for the session, the week and per-model caps, once per window, in Windows notifications.
 - **Tray icon that drains too,** with your numbers on hover. Left-click shows or hides the widget; right-click opens the menu.
+- **Burn-rate forecast.** "At this pace: runs out 3:40 PM", or that it lasts till the refill, with an optional alert before you run out.
+- **Settings, history and a welcome.** A settings window (gear on the widget, or the tray menu) with a usage history chart for today and the week.
+- **Your drink, your look.** Teh tarik, kopi O, Milo ais, teh ais or sirap bandung. Dark mode, Bahasa Melayu, bigger text and a compact strip.
+- **Stays out of the way.** Hides itself in full screen and presentations; Ctrl+Alt+T shows or hides it.
+- **Festive outfits** for Hari Raya, Chinese New Year, Deepavali, Kaamatan, Gawai, Merdeka, Malaysia Day and Christmas.
+- **More alerts:** "fresh glass ready" after you hit the limit, and a warning if claude.ai changes its usage page.
 - **Poke the glass.** It reacts. Poke it 10 times in 4 seconds for a full-screen teh tarik show with chimes (Skip or Esc ends it).
 
 ## Where the numbers come from
@@ -31,7 +37,11 @@ Download `TehTarikMeter-Setup-<version>.exe` from [Releases](https://github.com/
 
 ## Tray menu
 
-Show/hide the widget · Refresh now · Keep on top · Alerts at 80% and 95% · Sound in the teh tarik show · Start with Windows · Connect/Disconnect Claude Code · Open claude.ai usage page · Sign in/Sign out · Check for updates · Quit
+Show/hide the widget · Refresh now · Settings · Compact widget · Keep on top · Connect/Disconnect Claude Code · Open claude.ai usage page · Sign in/Sign out · Check for updates · Quit. Everything else is in Settings.
+
+## Microsoft Store
+
+`npm run dist:store` (on Windows) builds `TehTarikMeter-Store-<version>.appx`, or run the **Store package** workflow. Set the repository variables `STORE_IDENTITY_NAME`, `STORE_PUBLISHER`, `STORE_PUBLISHER_NAME`, `STORE_DISPLAY_NAME` and `STORE_PRODUCT_ID` from Partner Center first. Store review may ask how the app reads claude.ai with your sign-in; point them to PRIVACY.md.
 
 ## Privacy
 
@@ -43,7 +53,7 @@ See [PRIVACY.md](PRIVACY.md). In short: the app only talks to claude.ai (your us
 npm install
 npm test                 # automatic tests
 npm start                # run against your real claude.ai account
-npm run demo             # fake numbers, no network (TTM_DEMO_SESSION=85 etc. pin them)
+npm run demo             # fake numbers, no network (TTM_DEMO_SESSION=85, TTM_LANG=ms, TTM_THEME=dark, TTM_FESTIVAL=raya, TTM_DEMO_HISTORY=1)
 npm run dist:installer   # build the Windows installer into dist/installer
 ```
 

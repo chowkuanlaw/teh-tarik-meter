@@ -15,20 +15,23 @@
 <header class="bar">
 <div class="brand"><span class="live" id="liveDot" aria-hidden="true"></span><span>Teh Tarik Meter</span></div>
 <div class="tools">
-<button class="icon" id="btnTop" aria-label="Keep on top" aria-pressed="true" title="Keep on top">
+<button class="icon" id="btnTop" aria-pressed="true">
 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6l-1 6 3 3H7l3-3-1-6z"/><path d="M12 13v7"/></svg>
 </button>
-<button class="icon" id="btnMenu" aria-label="Menu" title="Menu">
-<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg>
+<button class="icon" id="btnCompact">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>
 </button>
-<button class="icon" id="btnHide" aria-label="Hide to tray" title="Hide to tray">
+<button class="icon" id="btnSettings">
+<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+</button>
+<button class="icon" id="btnHide">
 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
 </button>
 </div>
 </header>
 
 <div class="row">
-<button class="stage" id="stage" aria-label="Poke the teh tarik glass">
+<button class="stage" id="stage">
 
 <div class="pour" aria-hidden="true">
 <div class="stream"></div>
@@ -51,6 +54,7 @@
 <div class="tea" id="tea">
 <svg class="wave2" viewBox="0 0 232 22" width="232" height="22"><path d="M0 8 Q14.5 2 29 8 T58 8 T87 8 T116 8 T145 8 T174 8 T203 8 T232 8 V22 H0 Z"/></svg>
 <svg class="wave" viewBox="0 0 232 22" width="232" height="22"><path d="M0 8 Q14.5 2 29 8 T58 8 T87 8 T116 8 T145 8 T174 8 T203 8 T232 8 V20 H0 Z"/></svg>
+<i class="ice ice1"></i><i class="ice ice2"></i>
 </div>
 <div class="bubbles" id="bubbles"><i></i><i></i><i></i></div>
 </div>
@@ -73,6 +77,16 @@
 <path id="mouth" class="line" d=""/>
 </svg>
 
+<svg class="festive" viewBox="0 0 160 240" width="160" height="240" aria-hidden="true">
+<g class="f-raya"><path d="M52 64 L54 44 Q80 37 106 44 L108 64 Z" class="hat-black"/><path d="M54 58 L106 58" class="gold"/></g>
+<g class="f-xmas"><path d="M50 64 Q64 28 98 20 Q116 32 112 64 Z" class="hat-red"/><rect x="44" y="56" width="74" height="11" rx="5.5" class="trim"/><circle cx="99" cy="20" r="7" class="trim"/></g>
+<g class="f-cny"><path d="M14 153 L14 160" class="thin"/><rect x="8" y="158" width="12" height="4" rx="1" class="goldfill"/><ellipse cx="14" cy="172" rx="11" ry="12" class="lantern"/><path d="M14 161 L14 183" class="lantern-rib"/><rect x="8" y="182" width="12" height="4" rx="1" class="goldfill"/><path d="M14 186 L14 197" class="gold"/></g>
+<g class="f-deepavali"><path d="M141 221 Q135 211 141 200 Q147 211 141 221 Z" class="flame"/><path d="M125 221 Q141 238 157 221 Z" class="diya"/></g>
+<g class="f-flag"><path d="M144 156 L144 108" class="pole"/><rect x="144" y="108" width="22" height="14" class="flag-w"/><path d="M144 110 H166 M144 113.5 H166 M144 117 H166 M144 120.5 H166" class="flag-r"/><rect x="144" y="108" width="10" height="8" class="flag-b"/><circle cx="148.5" cy="112" r="2.3" class="flag-y"/></g>
+<g class="f-band"><rect x="25" y="59" width="110" height="8" rx="4" class="band"/><circle cx="36" cy="63" r="2.4" class="bead-r"/><circle cx="48" cy="63" r="2.4" class="bead-y"/><circle cx="60" cy="63" r="2.4" class="bead-w"/><circle cx="72" cy="63" r="2.4" class="bead-r"/><circle cx="84" cy="63" r="2.4" class="bead-y"/><circle cx="96" cy="63" r="2.4" class="bead-w"/><circle cx="108" cy="63" r="2.4" class="bead-r"/><circle cx="120" cy="63" r="2.4" class="bead-y"/></g>
+<g class="f-feather"><path d="M120 60 Q134 34 124 12" class="feather"/><path d="M124 12 Q128 20 126 26" class="feather-tip"/></g>
+</svg>
+
 <div class="drip" aria-hidden="true"></div>
 <span class="z z1" aria-hidden="true">z</span><span class="z z2" aria-hidden="true">z</span>
 </div>
@@ -81,42 +95,69 @@
 </button>
 
 <div class="side">
-<div class="bubble" id="bubble" role="status"><span id="line">Brewing your teh tarik...</span></div>
+<div class="bubble" id="bubble" role="status"><span id="line"></span></div>
 
 <div id="numbers">
-<div class="label">Current session</div>
+<div class="label" id="lblSession"></div>
 <div class="big" id="sLeft">--</div>
-<div class="small strong">left in your glass</div>
+<div class="small strong" id="lblLeftIn"></div>
 <div class="small muted" id="sSub"></div>
+<div class="small pace" id="pace" hidden></div>
 </div>
 
 <div id="signin" hidden>
-<div class="label">Not signed in</div>
-<p class="small">Sign in to claude.ai once and I'll keep an eye on your usage.</p>
-<button class="btn primary" id="btnSignIn">Sign in to Claude</button>
-<button class="link" id="btnKey" aria-expanded="false">Use a session key instead</button>
+<div class="label" id="lblNotSigned"></div>
+<p class="small" id="lblSigninText"></p>
+<button class="btn primary" id="btnSignIn"></button>
+<button class="link" id="btnKey" aria-expanded="false"></button>
 <form id="keyForm" hidden>
-<label class="small" for="keyInput">Paste the <b>sessionKey</b> cookie from claude.ai in your browser</label>
+<label class="small" for="keyInput" id="lblKey"></label>
 <input id="keyInput" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-...">
-<div class="keyrow"><button class="btn" type="submit">Save</button><span class="small muted" id="keyMsg" role="status"></span></div>
+<div class="keyrow"><button class="btn" type="submit" id="btnKeySave"></button><span class="small muted" id="keyMsg" role="status"></span></div>
 </form>
 </div>
 </div>
 </div>
 
 <section class="week" id="week">
-<div class="spread"><span class="label">This week · 7 cups</span><span class="pct" id="wLeft">--</span></div>
+<div class="spread"><span class="label" id="lblWeek"></span><span class="pct" id="wLeft">--</span></div>
 <div class="cups" id="cups" aria-hidden="true"></div>
 <div class="small muted" id="wSub"></div>
 <div class="small muted" id="models" hidden></div>
+<div class="small muted" id="extra" hidden></div>
 </section>
 
+<button class="link news" id="btnNews" hidden></button>
 <footer class="foot">
-<span class="sync" id="sync" role="status">Starting...</span>
-<button class="btn tiny" id="btnRefresh">Refresh now</button>
+<span class="sync" id="sync" role="status"></span>
+<button class="btn tiny" id="btnRefresh"></button>
 </footer>
+
+<!-- compact strip -->
+<div class="mini" id="mini">
+<button class="miniglass" id="miniGlass">
+<svg viewBox="-6 -2 132 172" width="42" height="56" aria-hidden="true">
+<polygon points="12,20 108,20 97,160 23,160" class="glassfill"/>
+<polygon id="miniTea" points="0,0 0,0 0,0" class="teafill"/>
+<polygon id="miniFoam" points="0,0 0,0 0,0" class="foamfill"/>
+<polygon points="12,20 108,20 97,160 23,160" class="line"/>
+<path id="miniEyes" d=""/>
+</svg>
+</button>
+<div class="minitext">
+<div class="minibig" id="miniLeft">--</div>
+<div class="small muted" id="miniSub"></div>
+</div>
+<div class="minitools">
+<button class="icon" id="btnExpand"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+<button class="icon" id="btnHide2"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+</div>
+</div>
 </div>
 </main>
+
+<!-- ======================= APP: settings, history, about, welcome ======================= -->
+<main id="app" class="view" hidden></main>
 
 <!-- ======================= SHOW (easter egg) ======================= -->
 <main id="show" class="view" hidden>
@@ -127,9 +168,9 @@
 <div class="showtools">
 <button class="pill" id="btnSound" aria-pressed="false">
 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path id="soundWaves" d="M16.5 8.5a5 5 0 0 1 0 7M19.5 5.5a9 9 0 0 1 0 13"/></svg>
-<span id="soundLabel">Sound on</span>
+<span id="soundLabel"></span>
 </button>
-<button class="pill" id="btnSkip">Skip show</button>
+<button class="pill" id="btnSkip"></button>
 </div>
 
 <div class="scaler" id="scaler">
@@ -204,9 +245,12 @@
 </div>
 </main>
 
+<script src="i18n.js"></script>
 <script src="format.js"></script>
+<script src="data.js"></script>
 <script src="glass.js"></script>
 <script src="widget.js"></script>
+<script src="app.js"></script>
 <script src="show.js"></script>
 </body>
 </html>

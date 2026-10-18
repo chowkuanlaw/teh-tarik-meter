@@ -7,7 +7,11 @@ Teh Tarik Meter runs on your PC and has no server of its own. It sends nothing a
 - **claude.ai**, as you. It reads the same numbers as your Settings › Usage page: your organization list (to know whose usage to read) and your usage limits. It never reads your chats, projects or files.
 - **GitHub**, to check this repository's releases for updates (installed copies only).
 
-That's all the network traffic it makes.
+That's all the network traffic it makes. (The Microsoft Store copy doesn't check GitHub; the Store updates it.)
+
+## Hiding in full screen
+
+To hide the widget during full screen apps and presentations, the app asks Windows every few seconds whether an app is full screen or presenting (`SHQueryUserNotificationState`, the same check as Lapis). It never looks at your screen, microphone or camera. Turn off **Hide the widget in full screen and presentations** in Settings to stop it.
 
 ## Your claude.ai sign-in
 
@@ -30,6 +34,9 @@ If you already had a status line, the script runs it and shows its output, so yo
 
 Everything lives in `%APPDATA%\Teh Tarik Meter\`:
 
-- `state.json`: settings, widget position, your last usage reading and which alerts were already sent
+- `state.json`: settings, widget position, your last usage reading and which alerts were already sent, plus a daily copy, `state.bak.json`
+- `history.json`: your session and weekly usage percentages over the last 8 days, for the History chart and the forecast
 - `claude-code-feed.json`: the latest limits from Claude Code
 - the encrypted browser profile for claude.ai
+
+When you uninstall, the app asks whether to remove this folder too.

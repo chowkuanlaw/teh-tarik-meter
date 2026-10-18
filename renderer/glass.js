@@ -1,5 +1,5 @@
 'use strict';
-/* The glass mascot's faces, lines and drawings, shared by the widget and the show. */
+/* The glass mascot's faces and drawings, shared by the widget, the settings window and the show. */
 (function (root) {
   const DOTS = 'M19.5 16 a2.5 2.5 0 1 0 5 0 a2.5 2.5 0 1 0 -5 0 M43.5 16 a2.5 2.5 0 1 0 5 0 a2.5 2.5 0 1 0 -5 0';
   const ARCS = 'M18.5 17 Q22 12.5 25.5 17 M42.5 17 Q46 12.5 49.5 17';
@@ -16,27 +16,7 @@
     excited: { eyes: ARCS, eyesFilled: false, brows: '', mouth: 'M28 23 Q34 32 40 23 Z', mouthFilled: true, wave: true }
   };
 
-  const LINES = {
-    happy: 'Still panas! Plenty left, sip slowly ya.',
-    okay: 'Half glass gone already ah. Pace yourself.',
-    worried: 'Eh, slow down a bit lah!',
-    panic: 'Alamak, last few sips only!',
-    asleep: 'Habis already... wake me at reset. zzz',
-    excited: 'Tarik... tarik... ahh, fresh teh tarik!',
-    weeklyLow: "This week's pot is running low. Go easy ya.",
-    signedOut: 'Sign in so I can watch your teh.',
-    starting: 'Brewing your teh tarik...',
-    fresh: 'Fresh glass, ready when you are!'
-  };
-  const POKES = ['Oi, careful lah, later tumpah!', 'Teh tarik kaw kaw, ready for work!', 'Hehe, geli lah. Stop poking!', 'Kurang manis? Not my fault ah.'];
-  function comboLine(n) {
-    if (n >= 9) return 'One more and I show you something...';
-    if (n >= 7) return 'Aiyo... you really want to see ah?';
-    if (n >= 5) return 'Eh eh eh, stop poking lah!';
-    return null;
-  }
-
-  // Tea inside the big glass drawing (viewBox 0 -30 120 198): polygons for a level 0-100.
+  // Tea inside the small glass drawing (viewBox 0 -30 120 198): polygons for a level 0-100.
   function teaPolys(left) {
     const xl = y => 14 + (y - 22) * 10 / 136, xr = y => 106 - (y - 22) * 10 / 136, f = n => n.toFixed(1);
     const none = '0,0 0,0 0,0';
@@ -46,6 +26,8 @@
       foam: H > 9 ? `${f(xl(yT))},${f(yT)} ${f(xr(yT))},${f(yT)} ${f(xr(fb))},${f(fb)} ${f(xl(fb))},${f(fb)}` : none
     };
   }
+  // Two dot eyes for the small glass drawings.
+  const MINI_EYES = 'M44 96 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0 M66 96 a5 5 0 1 0 10 0 a5 5 0 1 0 -10 0';
 
   const SVG = 'http://www.w3.org/2000/svg';
   function el(tag, attrs, parent) {
@@ -53,6 +35,18 @@
     for (const k in attrs) n.setAttribute(k, attrs[k]);
     if (parent) parent.appendChild(n);
     return n;
+  }
+
+  // A small glass picture (for the settings window), filled to `left` with a drink.
+  function miniGlass(svg, left, eyes) {
+    svg.setAttribute('viewBox', '-6 -2 132 172');
+    const p = teaPolys(left);
+    el('polygon', { points: '12,20 108,20 97,160 23,160', class: 'glassfill' }, svg);
+    el('polygon', { points: p.tea, class: 'teafill' }, svg);
+    el('polygon', { points: p.foam, class: 'foamfill' }, svg);
+    el('polygon', { points: '12,20 108,20 97,160 23,160', class: 'line' }, svg);
+    if (eyes !== false) el('path', { d: MINI_EYES, class: 'eyesfill' }, svg);
+    return svg;
   }
 
   // A pulling mug with a face (viewBox 0 0 64 72). Returns its foam ellipse.
@@ -84,14 +78,15 @@
     c.tea.setAttribute('y', (37.5 - h).toFixed(1));
     c.tea.setAttribute('height', h.toFixed(1));
     c.eyes.setAttribute('d', awake ? CUP_DOTS : 'M10 22 L14 22 M16 22 L20 22');
-    c.eyes.setAttribute('fill', awake ? '#3A2A22' : 'none');
+    c.eyes.classList.toggle('filled', awake);
     c.mouth.setAttribute('d', fr >= 0.5 ? 'M12.5 26.5 Q15 29 17.5 26.5' : (awake ? 'M13 27.5 L17 27.5' : 'M14 27.5 a1 1 0 1 0 2 0 a1 1 0 1 0 -2 0'));
     return awake;
   }
 
-  // Tray icon: the glass with its current tea level, at 1x, 1.5x and 2x.
-  function trayIcons(left, dim) {
+  // Tray icon: the glass with its current level in the chosen drink, at 1x, 1.5x and 2x.
+  function trayIcons(left, dim, drink, dark) {
     const out = [];
+    const ink = dark ? '#F1E4D3' : '#3A2A22';
     for (const scale of [1, 1.5, 2]) {
       const s = Math.round(16 * scale);
       const cv = document.createElement('canvas');
@@ -107,11 +102,11 @@
         const y = bot - (bot - top - 1.5 * k) * lv;
         const [a, b] = at(y);
         g.beginPath(); g.moveTo(a, y); g.lineTo(b, y); g.lineTo(r1, bot); g.lineTo(l1, bot); g.closePath();
-        g.fillStyle = '#C8874E'; g.fill();
-        g.fillStyle = '#F3DEC0'; g.fillRect(a + 0.3 * k, y, b - a - 0.6 * k, Math.max(1, 1.4 * k));
+        g.fillStyle = (drink && drink.tea) || '#C8874E'; g.fill();
+        g.fillStyle = (drink && drink.foam) || '#F3DEC0'; g.fillRect(a + 0.3 * k, y, b - a - 0.6 * k, Math.max(1, 1.4 * k));
       }
       g.beginPath(); g.moveTo(l0, top); g.lineTo(r0, top); g.lineTo(r1, bot); g.lineTo(l1, bot); g.closePath();
-      g.lineWidth = Math.max(1.2, 1.3 * k); g.lineJoin = 'round'; g.strokeStyle = dim ? '#8C7A6E' : '#3A2A22'; g.stroke();
+      g.lineWidth = Math.max(1.2, 1.3 * k); g.lineJoin = 'round'; g.strokeStyle = dim ? '#8C7A6E' : ink; g.stroke();
       g.fillStyle = dim ? '#8C7A6E' : '#3A2A22';
       const ey = 9.5 * k, er = Math.max(0.8, 0.9 * k);
       g.beginPath(); g.arc(6.2 * k, ey, er, 0, Math.PI * 2); g.arc(9.8 * k, ey, er, 0, Math.PI * 2); g.fill();
@@ -120,5 +115,12 @@
     return out;
   }
 
-  root.TTGlass = { FACES, LINES, POKES, comboLine, teaPolys, drawMug, drawCup, setCup, trayIcons };
+  // Applies the drink's colours to the page.
+  function applyDrink(drink) {
+    const s = document.body.style;
+    s.setProperty('--tea', drink.tea); s.setProperty('--tea2', drink.tea2);
+    s.setProperty('--foam', drink.foam); s.setProperty('--foam2', drink.foam2);
+  }
+
+  root.TTGlass = { FACES, teaPolys, MINI_EYES, miniGlass, drawMug, drawCup, setCup, trayIcons, applyDrink };
 })(window);
