@@ -1,10 +1,13 @@
 # Changelog
 
+## 1.3.2 (2026-10-18)
+
+- Wording only: the surprise stays a surprise. The **Music and sounds** setting (Settings › Look) was renamed, and the "What's new" notes no longer give anything away.
+
 ## 1.3.1 (2026-10-18)
 
-- **Every drink's show has its own captions.** Before, all five shows opened with the same line, teh ais reused teh tarik's first three steps, and several steps and bows shared titles ("Tarik! Tarik! Tarik!", "Ais!", "Back to work lah"). Now each drink has its own words for all seven moments, in English and Bahasa Melayu, for example "Ten pokes?! Need kopi ah?", "Step 3 · Tarik sejuk!" (teh ais) and "Step 4 · Ais & rahsia" (Milo ais).
-- The glass's "Sign in so I can watch your…" and one of its poke replies now name your drink instead of always saying teh tarik.
-- A test now fails if two drinks ever share a caption.
+- **Every drink's surprise has its own words.** If you've found the glass's hidden surprise, each drink now tells it differently, in English and Bahasa Melayu.
+- The glass's "Sign in so I can watch your…" line and one of its replies now name your drink instead of always saying teh tarik.
 
 ## 1.3.0 (2026-10-18)
 
@@ -12,17 +15,12 @@
 - **Claude Code connection moved to your user folder**, `%USERPROFILE%\.teh-tarik-meter`. The Microsoft Store version runs as a package, and Windows keeps a package's AppData private, so Claude Code couldn't have reached the old place. If you're already connected, the app moves it over by itself the next time it starts, with the same status line. Disconnecting now also deletes the script.
 - **Trademark notes** in Settings › About and the README: Teh Tarik Meter isn't made or endorsed by Anthropic (Claude is Anthropic's trademark), and Milo is a trademark of Nestlé, used only as a drink name.
 - **Release notes now include the changelog** for that version.
-- **Bahasa Melayu touch-ups** across the widget, alerts and the show captions.
+- **Bahasa Melayu touch-ups** across the widget and alerts.
 - Microsoft Store listing text, screenshots and certification notes are in the `store` folder.
 
 ## 1.2.0 (2026-10-18)
 
-- **An easter egg for every drink.** Poke the glass 10 times and the show now makes the drink you picked:
-  - **Kopi O:** coffee through the sock, a spoon of sugar and no milk, three pulls, served hot and black.
-  - **Teh ais:** the teh tarik steps, then ice into the glass with a clink, and the tea poured over.
-  - **Milo ais:** two scoops of powder, hot water from the kettle, *Kacau! ×3*, ice, and a surprise heap of powder on top (Milo dinosaur).
-  - **Sirap bandung:** rose syrup, milk swirling it pink, a stir instead of a pull, and lots of ice.
-  - Teh tarik stays as it was. Captions are in English and Bahasa Melayu, and the music adds spoon and ice clinks.
+- **A surprise for every drink.** The glass has a hidden surprise, and now it changes with the drink you picked. We'll let you find it.
 
 ## 1.1.0 (2026-10-18)
 
@@ -32,7 +30,7 @@
 - **First-launch welcome:** pick a language and drink, sign in, and connect Claude Code.
 - **Pick your drink:** teh tarik, kopi O, Milo ais, teh ais or sirap bandung. Iced drinks get ice cubes instead of steam. The weekly cups and the tray icon follow.
 - **Dark mode**, or follow Windows.
-- **Bahasa Melayu** for every screen, alert, the tray menu and the teh tarik show.
+- **Bahasa Melayu** for every screen, alert and the tray menu.
 - **Text size:** Normal, Large or Larger.
 - **Compact widget:** a small strip with the glass, your session and the week.
 - **Hides itself in full screen and presentations**, using the same Windows check as Lapis.
@@ -49,4 +47,4 @@
 
 ## 1.0.0 (2026-10-18)
 
-First release: the living teh tarik glass, weekly cups, live claude.ai usage, the Claude Code status line feed, alerts, the tray icon and the 10-poke teh tarik show.
+First release: the living teh tarik glass, weekly cups, live claude.ai usage, the Claude Code status line feed, alerts, the tray icon and a hidden surprise.

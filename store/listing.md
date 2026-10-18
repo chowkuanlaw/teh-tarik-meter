@@ -36,7 +36,7 @@ Teh Tarik Meter is a cute desktop widget that shows your Claude session and week
 • Your drink, your look. Teh tarik, kopi O, Milo ais, teh ais or sirap bandung. Light or dark, English or Bahasa Melayu, normal or larger text, or a small compact strip.
 • Stays out of your way. Hides during full screen apps and presentations. Ctrl+Alt+T shows or hides it.
 • Festive outfits for Hari Raya, Chinese New Year, Deepavali, Kaamatan, Gawai, Merdeka, Malaysia Day and Christmas.
-• And a surprise: poke the glass 10 times quickly.
+• And a little surprise, for the curious.
 
 You need a Claude account (claude.ai). Sign in once on claude.ai's own page inside the app. The meter reads the same numbers as your Settings › Usage page. It never reads your chats, has no server of its own and sends nothing about you anywhere else. Not signed in yet? Tap "Peek at a sample first" to see it with made-up numbers.
 
@@ -48,7 +48,7 @@ Your Claude session and weekly limits as a cute, living glass of teh tarik on yo
 
 ### What's new in this version
 
-Peek at a sample before you sign in. Claude Code connection now works in the Store version. Every drink has its own surprise show.
+Peek at a sample before you sign in. Claude Code connection now works in the Store version. Every drink has its own hidden surprise.
 
 ### Product features (one per line)
 
@@ -90,7 +90,7 @@ Teh Tarik Meter ialah widget desktop comel yang menunjukkan had sesi dan had min
 • Minuman anda, gaya anda. Teh tarik, kopi O, Milo ais, teh ais atau sirap bandung. Cerah atau gelap, Bahasa Melayu atau English, teks biasa atau lebih besar, atau jalur padat yang kecil.
 • Tidak mengganggu. Bersembunyi semasa apl skrin penuh dan pembentangan. Ctrl+Alt+T menunjuk atau menyembunyikannya.
 • Pakaian perayaan untuk Hari Raya, Tahun Baru Cina, Deepavali, Kaamatan, Gawai, Merdeka, Hari Malaysia dan Krismas.
-• Dan satu kejutan: cucuk gelas 10 kali dengan pantas.
+• Dan satu kejutan kecil, untuk yang suka mencuba.
 
 Anda perlukan akaun Claude (claude.ai). Log masuk sekali di halaman claude.ai sendiri dalam apl. Meter membaca nombor yang sama seperti halaman Tetapan › Penggunaan anda. Ia tidak pernah membaca perbualan anda, tiada pelayan sendiri dan tidak menghantar apa-apa tentang anda ke tempat lain. Belum log masuk? Tekan "Intai contoh dulu" untuk melihatnya dengan nombor rekaan.
 
@@ -102,7 +102,7 @@ Had sesi dan mingguan Claude anda sebagai segelas teh tarik comel yang hidup di 
 
 ### Apa yang baharu
 
-Intai contoh sebelum log masuk. Sambungan Claude Code kini berfungsi dalam versi Store. Setiap minuman ada pertunjukan kejutan sendiri.
+Intai contoh sebelum log masuk. Sambungan Claude Code kini berfungsi dalam versi Store. Setiap minuman ada kejutan tersembunyi sendiri.
 
 ### Ciri produk
 
@@ -141,8 +141,7 @@ Teh Tarik Meter shows the signed-in user's Claude (claude.ai) usage limits. Show
 1. Start Teh Tarik Meter. The widget appears at the top right of the screen with a sleeping glass, "Not signed in".
 2. Click "Peek at a sample first". The widget shows sample numbers (marked "Sample numbers, not yours" at the bottom): the glass, the countdown, the forecast and the weekly cups.
 3. Click the gear icon for Settings. The History tab shows a sample chart. Look and General tabs change the drink, theme, language and text size.
-4. Click the glass 10 times quickly to see a 16-second full-screen animation. Press Esc or "Skip show" to end it.
-5. Right-click the tray icon for the menu. Ctrl+Alt+T hides and shows the widget.
+4. Right-click the tray icon for the menu. Ctrl+Alt+T hides and shows the widget.
 
 "Connect Claude Code" is optional and only for people who use the Claude Code command-line tool. It asks before changing anything and edits only Claude Code's own settings file in the user's profile, after saving a backup.
 
