@@ -42,7 +42,7 @@ Show/hide the widget · Refresh now · Settings · Compact widget · Keep on top
 
 ## Microsoft Store
 
-`npm run dist:store` (on Windows) builds `TehTarikMeter-Store-<version>.appx`, or run the **Store package** workflow. Set the repository variables `STORE_IDENTITY_NAME`, `STORE_PUBLISHER`, `STORE_PUBLISHER_NAME`, `STORE_DISPLAY_NAME` and `STORE_PRODUCT_ID` from Partner Center first. The listing text (English and Bahasa Melayu), screenshots, certification notes and a test list are in [`store/`](store/listing.md). The Store copy keeps the Claude Code bridge in `%USERPROFILE%\.teh-tarik-meter`, because Windows keeps a packaged app's AppData private.
+`npm run dist:store` (on Windows) builds `TehTarikMeter-Store-<version>.appx`, or run the **Store package** workflow. The Partner Center identity is in `package.json` (`build.appx`), and the workflow runs by itself whenever `package.json` changes on `main`; download the package from the run's Artifacts. The listing text (English and Bahasa Melayu), screenshots, certification notes and a test list are in [`store/`](store/listing.md). The Store copy keeps the Claude Code bridge in `%USERPROFILE%\.teh-tarik-meter`, because Windows keeps a packaged app's AppData private.
 
 ## Privacy
 

@@ -163,7 +163,7 @@ Start with **Private audience** (only the Microsoft accounts you list can find a
 ## Partner Center steps
 
 1. In your existing developer account (the one used for Lapis), create a new app and reserve the name **Teh Tarik Meter**.
-2. Open Product management › Product identity. Copy the four values into this repository's Actions variables (Settings › Secrets and variables › Actions › Variables): `STORE_IDENTITY_NAME` (Package/Identity/Name), `STORE_PUBLISHER` (Package/Identity/Publisher, starts with CN=), `STORE_PUBLISHER_NAME` (Package/Properties/PublisherDisplayName) and `STORE_DISPLAY_NAME` (Teh Tarik Meter). Add `STORE_PRODUCT_ID` (the Store ID, starts with 9) too if you later want the workflow to upload submissions for you.
+2. The Product identity values are already in `package.json` (`build.appx`), and the **Store package** workflow builds by itself whenever `package.json` changes on `main` (or run it by hand from Actions). Add the repository variable `STORE_PRODUCT_ID` (9PGTMV7K7MJQ) only if you later want the workflow to upload submissions for you.
 3. In GitHub Actions, run **Store package** with Send = none. Download the `.appx` file from the run's artifacts.
 4. In Partner Center, start a submission: Pricing and availability (Free, Private audience first), Properties (Productivity, privacy policy URL, support contact), Age ratings (questionnaire), Packages (upload the `.appx`), Store listings (paste the text above, upload the screenshots in order, English and Malay), Submission options (runFullTrust reason and certification notes above).
 5. Submit. Certification usually takes 1 to 3 business days.

@@ -3,9 +3,10 @@ name: Store package
 # Builds the Microsoft Store package (TehTarikMeter-Store-<version>.appx) from this repository and keeps it
 # as a workflow artifact. The Store signs the package itself, so no certificate is involved.
 #
-# The Partner Center identity (Product management > Product identity) comes from repository
-# variables, or is typed in when the run is started by hand, so it never sits in the source code:
-#   STORE_IDENTITY_NAME, STORE_PUBLISHER, STORE_PUBLISHER_NAME, STORE_DISPLAY_NAME
+# The Partner Center identity (Product management > Product identity) is in package.json (build.appx).
+# It is public anyway: Windows shows it in every installed copy. Values typed in when the run is started
+# by hand, or the repository variables STORE_IDENTITY_NAME, STORE_PUBLISHER, STORE_PUBLISHER_NAME and
+# STORE_DISPLAY_NAME, take precedence.
 #
 # Sending it to the Store (optional) needs four repository secrets from a Partner Center
 # Microsoft Entra application with the Manager role:
@@ -13,6 +14,10 @@ name: Store package
 # "draft" uploads the package into a new submission and stops, for a person to press Submit.
 # "submit" also submits it for certification. Microsoft still certifies every update.
 on:
+  # Also builds by itself when package.json changes on main (a new version, or new identity values).
+  push:
+    branches: [main]
+    paths: ['package.json', '.github/workflows/store.yml']
   workflow_dispatch:
     inputs:
       send:
@@ -69,7 +74,10 @@ jobs:
       - run: npm ci
       - name: Automatic tests
         run: node --test test/*.test.js
+      # The identity is in package.json (build.appx). Values typed in at the start of a run, or set as
+      # repository variables, take precedence.
       - name: Fill in the Partner Center identity
+        if: env.ID_NAME != ''
         run: node scripts/store-identity.js
       - name: Build the Store package
         run: npx electron-builder --win appx --x64 --publish never
@@ -84,8 +92,12 @@ jobs:
           $r = New-Object IO.StreamReader(($z.Entries | Where-Object FullName -eq 'AppxManifest.xml').Open())
           [xml]$m = $r.ReadToEnd(); $r.Dispose()
           $z.Dispose()
-          if ($m.Package.Identity.Name -ne $env:ID_NAME.Trim()) { throw "identity name in the manifest doesn't match" }
-          if ($m.Package.Identity.Publisher -ne $env:ID_PUB.Trim()) { throw "publisher in the manifest doesn't match" }
+          $pkg = Get-Content package.json -Raw | ConvertFrom-Json
+          $wantName = if ($env:ID_NAME) { $env:ID_NAME.Trim() } else { $pkg.build.appx.identityName }
+          $wantPub = if ($env:ID_PUB) { $env:ID_PUB.Trim() } else { $pkg.build.appx.publisher }
+          if ($wantName -like 'PLACEHOLDER*') { throw "the Partner Center identity isn't set (package.json build.appx, or the run's inputs)" }
+          if ($m.Package.Identity.Name -ne $wantName) { throw "identity name in the manifest doesn't match" }
+          if ($m.Package.Identity.Publisher -ne $wantPub) { throw "publisher in the manifest doesn't match" }
           Write-Host "Identity: $($m.Package.Identity.Name) $($m.Package.Identity.Version)"
           foreach ($want in @('AppxManifest.xml', 'app/TehTarikMeter.exe', 'app/resources/app.asar', 'assets/StoreLogo.png')) {
             if (-not ($names -contains $want)) { throw "missing $want" }

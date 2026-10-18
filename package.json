@@ -96,9 +96,9 @@
       }
     ],
     "appx": {
-      "identityName": "PLACEHOLDER.TehTarikMeter",
-      "publisher": "CN=00000000-0000-0000-0000-000000000000",
-      "publisherDisplayName": "PLACEHOLDER",
+      "identityName": "ChowKuanLaw.TehTarikMeter",
+      "publisher": "CN=E9822468-5E9A-4EC8-97BC-2ACE9B45CD57",
+      "publisherDisplayName": "Chow Kuan Law",
       "applicationId": "TehTarikMeter",
       "displayName": "Teh Tarik Meter",
       "backgroundColor": "#FFF8F0",
