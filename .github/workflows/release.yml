@@ -1,0 +1,114 @@
+name: Release
+
+# Builds Teh Tarik Meter and publishes a GitHub Release with:
+#   TehTarikMeter-Setup-<version>.exe (+ .blockmap, latest.yml)  per-user installer that updates itself
+# Runs when a version tag such as v1.0.1 is pushed, or from the Actions tab with "Run workflow"
+# (it then creates the tag on the current commit). The tag must match the version in package.json.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version tag to publish; must match package.json, e.g. v1.0.1'
+        required: true
+
+permissions:
+  contents: read
+
+env:
+  TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+
+jobs:
+  check-version:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Tag matches package.json
+        run: |
+          VERSION="v$(node -p "require('./package.json').version")"
+          if [ "$TAG" != "$VERSION" ]; then
+            echo "::error::Tag $TAG does not match package.json version $VERSION"; exit 1
+          fi
+      - name: Automatic tests (usage parsing, live checks, alerts, Claude Code script)
+        run: node --test test/*.test.js
+
+  installer:
+    needs: check-version
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Tests on Windows (including the PowerShell status line script)
+        run: node --test test/*.test.js
+      - name: PowerShell status line script saves only the limits
+        shell: pwsh
+        run: |
+          $dir = Join-Path $env:RUNNER_TEMP 'ttm/statusline'
+          New-Item -ItemType Directory -Force $dir | Out-Null
+          Copy-Item statusline/teh-tarik-statusline.ps1 $dir
+          '{"command":null}' | Set-Content (Join-Path $dir 'chain.json')
+          $in = '{"cwd":"C:/secret","rate_limits":{"five_hour":{"used_percentage":40,"resets_at":4102444800},"seven_day":{"used_percentage":10,"resets_at":4102444800}}}'
+          $out = $in | powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $dir 'teh-tarik-statusline.ps1')
+          Write-Host "Status line: $out"
+          if ($out -notmatch 'session 60% left') { throw "unexpected status line: $out" }
+          $feed = Get-Content -Raw (Join-Path $env:RUNNER_TEMP 'ttm/claude-code-feed.json')
+          if ($feed -match 'secret') { throw 'feed kept more than the limits' }
+          if ($feed -notmatch '"used_percentage":40') { throw "feed missing numbers: $feed" }
+      - name: Build the installer
+        run: npx electron-builder --win nsis --x64 --publish never
+      - name: Smoke test (the packaged app starts and keeps running)
+        shell: pwsh
+        run: |
+          $exe = "dist/installer/win-unpacked/TehTarikMeter.exe"
+          node node_modules/@electron/fuses/dist/bin.js read --app $exe
+          $p = Start-Process $exe -PassThru
+          Start-Sleep -Seconds 20
+          if ($p.HasExited) { throw "Teh Tarik Meter exited early (code $($p.ExitCode)); not publishing" }
+          Get-Process TehTarikMeter -ErrorAction SilentlyContinue | Stop-Process -Force
+          Write-Host "Teh Tarik Meter started and stayed running."
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: installer
+          path: |
+            dist/installer/TehTarikMeter-Setup-*.exe
+            dist/installer/TehTarikMeter-Setup-*.exe.blockmap
+            dist/installer/latest.yml
+          if-no-files-found: error
+
+  publish:
+    needs: installer
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          path: out
+          merge-multiple: true
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls -la out
+          {
+            cat .github/release-notes.md
+            echo
+            echo "SHA-256 checksum:"
+            echo
+            echo '```'
+            (cd out && sha256sum TehTarikMeter-Setup-*.exe)
+            echo '```'
+          } > notes.md
+          gh release create "$TAG" out/* --target "$GITHUB_SHA" --title "Teh Tarik Meter ${TAG#v}" --notes-file notes.md

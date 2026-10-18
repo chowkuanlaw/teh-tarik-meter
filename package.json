@@ -1,0 +1,91 @@
+{
+  "name": "teh-tarik-meter",
+  "productName": "Teh Tarik Meter",
+  "version": "1.0.0",
+  "description": "Your Claude usage as a living glass of teh tarik: a cute Windows desktop widget with live session and weekly limits",
+  "main": "main.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chowkuanlaw/teh-tarik-meter.git"
+  },
+  "homepage": "https://github.com/chowkuanlaw/teh-tarik-meter#readme",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "demo": "cross-env TTM_DEMO=1 electron .",
+    "dist:installer": "electron-builder --win nsis --x64 --publish never",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "electron-updater": "6.8.10"
+  },
+  "devDependencies": {
+    "cross-env": "7.0.3",
+    "electron": "44.8.0",
+    "electron-builder": "26.17.0"
+  },
+  "build": {
+    "appId": "app.tehtarik.meter",
+    "productName": "Teh Tarik Meter",
+    "electronLanguages": ["en-US"],
+    "copyright": "Copyright (c) 2026 chowkuanlaw",
+    "directories": {
+      "output": "dist/installer",
+      "buildResources": "installer"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "lib/**",
+      "renderer/**",
+      "statusline/**",
+      "assets/**",
+      "LICENSE",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "statusline/**"
+    ],
+    "asar": true,
+    "electronFuses": {
+      "runAsNode": false,
+      "enableCookieEncryption": true,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "enableEmbeddedAsarIntegrityValidation": true,
+      "onlyLoadAppFromAsar": true,
+      "loadBrowserProcessSpecificV8Snapshot": false,
+      "grantFileProtocolExtraPrivileges": false
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "executableName": "TehTarikMeter"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowElevation": false,
+      "runAfterFinish": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Teh Tarik Meter",
+      "deleteAppDataOnUninstall": false,
+      "artifactName": "TehTarikMeter-Setup-${version}.${ext}"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "chowkuanlaw",
+        "repo": "teh-tarik-meter",
+        "releaseType": "release"
+      }
+    ]
+  }
+}

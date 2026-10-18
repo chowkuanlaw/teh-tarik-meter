@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; media-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Teh Tarik Meter</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<!-- ======================= WIDGET ======================= -->
+<main id="widget" class="view" hidden>
+<div class="card" id="card">
+
+<header class="bar">
+<div class="brand"><span class="live" id="liveDot" aria-hidden="true"></span><span>Teh Tarik Meter</span></div>
+<div class="tools">
+<button class="icon" id="btnTop" aria-label="Keep on top" aria-pressed="true" title="Keep on top">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6l-1 6 3 3H7l3-3-1-6z"/><path d="M12 13v7"/></svg>
+</button>
+<button class="icon" id="btnMenu" aria-label="Menu" title="Menu">
+<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg>
+</button>
+<button class="icon" id="btnHide" aria-label="Hide to tray" title="Hide to tray">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+</button>
+</div>
+</header>
+
+<div class="row">
+<button class="stage" id="stage" aria-label="Poke the teh tarik glass">
+
+<div class="pour" aria-hidden="true">
+<div class="stream"></div>
+<svg class="jug" viewBox="0 0 56 56" width="56" height="56">
+<path d="M16 18 L6 13 L16 25 Z" class="steel"/>
+<rect x="15" y="14" width="26" height="32" rx="3" class="steel"/>
+<path d="M41 20 q10 0 10 9 q0 9 -10 9" class="line"/>
+<path d="M20 20 L20 40" class="shine"/>
+</svg>
+</div>
+
+<div class="body" id="body">
+<svg class="steam" viewBox="0 0 80 40" width="80" height="40" aria-hidden="true">
+<path d="M22 36 q-5 -5 0 -9 q5 -4 0 -9 q-5 -4 0 -9"/>
+<path d="M40 34 q-5 -5 0 -9 q5 -4 0 -9 q-5 -4 0 -9"/>
+<path d="M58 36 q-5 -5 0 -9 q5 -4 0 -9 q-5 -4 0 -9"/>
+</svg>
+
+<div class="glass" aria-hidden="true">
+<div class="tea" id="tea">
+<svg class="wave2" viewBox="0 0 232 22" width="232" height="22"><path d="M0 8 Q14.5 2 29 8 T58 8 T87 8 T116 8 T145 8 T174 8 T203 8 T232 8 V22 H0 Z"/></svg>
+<svg class="wave" viewBox="0 0 232 22" width="232" height="22"><path d="M0 8 Q14.5 2 29 8 T58 8 T87 8 T116 8 T145 8 T174 8 T203 8 T232 8 V20 H0 Z"/></svg>
+</div>
+<div class="bubbles" id="bubbles"><i></i><i></i><i></i></div>
+</div>
+
+<svg class="outline" viewBox="0 0 128 172" width="128" height="172" aria-hidden="true">
+<path d="M14 20 L21 150" class="shine"/>
+<polygon points="5,5 123,5 110,167 18,167" class="line"/>
+</svg>
+
+<svg class="arms" viewBox="0 0 160 70" width="160" height="70" aria-hidden="true">
+<path d="M26 30 q-11 7 -12 19" class="line"/>
+<path id="armR" class="line armR" d="M133 30 q11 7 12 19"/>
+</svg>
+
+<svg class="face" viewBox="0 0 68 44" width="68" height="44" aria-hidden="true">
+<ellipse cx="12" cy="24" rx="4.5" ry="2.6" class="blush"/>
+<ellipse cx="56" cy="24" rx="4.5" ry="2.6" class="blush"/>
+<g class="eyes"><path id="eyes" d=""/></g>
+<path id="brows" class="line" d=""/>
+<path id="mouth" class="line" d=""/>
+</svg>
+
+<div class="drip" aria-hidden="true"></div>
+<span class="z z1" aria-hidden="true">z</span><span class="z z2" aria-hidden="true">z</span>
+</div>
+
+<span class="combo" id="combo" aria-hidden="true"></span>
+</button>
+
+<div class="side">
+<div class="bubble" id="bubble" role="status"><span id="line">Brewing your teh tarik...</span></div>
+
+<div id="numbers">
+<div class="label">Current session</div>
+<div class="big" id="sLeft">--</div>
+<div class="small strong">left in your glass</div>
+<div class="small muted" id="sSub"></div>
+</div>
+
+<div id="signin" hidden>
+<div class="label">Not signed in</div>
+<p class="small">Sign in to claude.ai once and I'll keep an eye on your usage.</p>
+<button class="btn primary" id="btnSignIn">Sign in to Claude</button>
+<button class="link" id="btnKey" aria-expanded="false">Use a session key instead</button>
+<form id="keyForm" hidden>
+<label class="small" for="keyInput">Paste the <b>sessionKey</b> cookie from claude.ai in your browser</label>
+<input id="keyInput" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-...">
+<div class="keyrow"><button class="btn" type="submit">Save</button><span class="small muted" id="keyMsg" role="status"></span></div>
+</form>
+</div>
+</div>
+</div>
+
+<section class="week" id="week">
+<div class="spread"><span class="label">This week · 7 cups</span><span class="pct" id="wLeft">--</span></div>
+<div class="cups" id="cups" aria-hidden="true"></div>
+<div class="small muted" id="wSub"></div>
+<div class="small muted" id="models" hidden></div>
+</section>
+
+<footer class="foot">
+<span class="sync" id="sync" role="status">Starting...</span>
+<button class="btn tiny" id="btnRefresh">Refresh now</button>
+</footer>
+</div>
+</main>
+
+<!-- ======================= SHOW (easter egg) ======================= -->
+<main id="show" class="view" hidden>
+<div class="spots" aria-hidden="true"><div class="spot"></div><div class="spot right"></div></div>
+<div class="tiles" id="tiles" aria-hidden="true"></div>
+<div class="confetti" id="confetti" aria-hidden="true"></div>
+
+<div class="showtools">
+<button class="pill" id="btnSound" aria-pressed="false">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path id="soundWaves" d="M16.5 8.5a5 5 0 0 1 0 7M19.5 5.5a9 9 0 0 1 0 13"/></svg>
+<span id="soundLabel">Sound on</span>
+</button>
+<button class="pill" id="btnSkip">Skip show</button>
+</div>
+
+<div class="scaler" id="scaler">
+<div class="caption" id="caption" role="status"><div class="cap"><span id="capTitle"></span><span id="capSub"></span></div></div>
+
+<div class="arena" id="arena">
+<div class="notes" aria-hidden="true">
+<svg class="note" viewBox="0 0 20 22"><path d="M7 3 L18 1 L18 15 A3.5 3 0 1 1 16 12.4 L16 5 L9 6.3 L9 17 A3.5 3 0 1 1 7 14.4 Z"/></svg>
+<svg class="note" viewBox="0 0 20 22"><path d="M7 3 L18 1 L18 15 A3.5 3 0 1 1 16 12.4 L16 5 L9 6.3 L9 17 A3.5 3 0 1 1 7 14.4 Z"/></svg>
+<svg class="note" viewBox="0 0 20 22"><path d="M7 3 L18 1 L18 15 A3.5 3 0 1 1 16 12.4 L16 5 L9 6.3 L9 17 A3.5 3 0 1 1 7 14.4 Z"/></svg>
+<svg class="note" viewBox="0 0 20 22"><path d="M7 3 L18 1 L18 15 A3.5 3 0 1 1 16 12.4 L16 5 L9 6.3 L9 17 A3.5 3 0 1 1 7 14.4 Z"/></svg>
+</div>
+<span class="count" id="count" aria-hidden="true"></span>
+
+<svg class="sock prop" id="sock" viewBox="0 0 80 120" width="80" height="120" aria-hidden="true">
+<path d="M20 14 L4 2" class="steelline"/>
+<path d="M21 15 L40 118 L59 15 Z" class="cloth"/>
+<path d="M29 58 L40 118 L51 58 Z" class="stain"/>
+<ellipse cx="40" cy="14" rx="20" ry="5" class="steelline"/>
+</svg>
+
+<div class="can prop" id="can" aria-hidden="true">
+<svg viewBox="0 0 56 64" width="56" height="64">
+<rect x="10" y="8" width="36" height="48" rx="4" class="tin"/>
+<rect x="10" y="22" width="36" height="20" class="label"/>
+<text x="28" y="36" text-anchor="middle">SUSU</text>
+<ellipse cx="28" cy="8" rx="18" ry="4" class="lid"/>
+</svg>
+</div>
+
+<div class="biggl prop" id="big" aria-hidden="true">
+<svg viewBox="0 -30 120 198" width="200" height="330">
+<g class="bsteam"><path d="M45 16 q-4 -4 0 -7 q4 -3 0 -7"/><path d="M60 14 q-4 -4 0 -6 q4 -3 0 -6"/><path d="M75 16 q-4 -4 0 -7 q4 -3 0 -7"/></g>
+<polygon points="12,20 108,20 97,160 23,160" class="glassfill"/>
+<polygon points="13.5,30 106.5,30 97,158 23,158" class="teafill"/>
+<polygon points="13.5,30 106.5,30 105.8,39 14.2,39" class="foamfill"/>
+<path d="M22 34 L28 140" class="shine"/>
+<polygon points="12,20 108,20 97,160 23,160" class="line"/>
+<path class="armL" d="M18 100 q-11 -5 -14 -18"/>
+<path class="armRb" d="M102 100 q12 -5 15 -18"/>
+<g transform="translate(26 74)">
+<ellipse cx="12" cy="24" rx="4.5" ry="2.6" class="blush"/><ellipse cx="56" cy="24" rx="4.5" ry="2.6" class="blush"/>
+<path d="M18.5 17 Q22 12.5 25.5 17 M42.5 17 Q46 12.5 49.5 17" class="line"/>
+<path d="M28 23 Q34 32 40 23 Z" class="mouthfill"/>
+</g>
+</svg>
+</div>
+
+<svg class="smallgl prop" id="small" viewBox="0 -30 120 198" width="110" height="182" aria-hidden="true">
+<polygon points="12,20 108,20 97,160 23,160" class="glassfill"/>
+<polygon id="smallTea" points="0,0 0,0 0,0" class="teafill"/>
+<polygon id="smallFoam" points="0,0 0,0 0,0" class="foamfill"/>
+<path d="M22 34 L28 140" class="shine"/>
+<polygon points="12,20 108,20 97,160 23,160" class="line"/>
+<path d="M18 100 q-11 -5 -14 -18" class="line"/><path d="M102 100 q12 -5 15 -18" class="line"/>
+<g transform="translate(26 74)">
+<ellipse cx="12" cy="24" rx="4.5" ry="2.6" class="blush"/><ellipse cx="56" cy="24" rx="4.5" ry="2.6" class="blush"/>
+<path d="M18.5 17 Q22 12.5 25.5 17 M42.5 17 Q46 12.5 49.5 17" class="line"/>
+<path d="M28 23 Q34 32 40 23 Z" class="mouthfill"/>
+</g>
+</svg>
+
+<div class="sstream" id="sstream" aria-hidden="true"></div>
+
+<div class="mug" id="mugA" aria-hidden="true"><svg viewBox="0 0 64 72" width="64" height="72"></svg></div>
+<div class="mug" id="mugB" aria-hidden="true"><svg viewBox="0 0 64 72" width="64" height="72"></svg></div>
+
+<span class="tarikpop" id="tarikpop" aria-hidden="true"></span>
+</div>
+
+<div class="steps" id="steps"></div>
+</div>
+</main>
+
+<script src="format.js"></script>
+<script src="glass.js"></script>
+<script src="widget.js"></script>
+<script src="show.js"></script>
+</body>
+</html>
