@@ -3,6 +3,10 @@
 </p>
 
 <p align="center">
+  <a href="https://apps.microsoft.com/detail/9PGTMV7K7MJQ"><img src="https://get.microsoft.com/images/en-us%20dark.svg" alt="Get it from Microsoft" width="200"></a>
+</p>
+
+<p align="center">
   <a href="https://github.com/chowkuanlaw/teh-tarik-meter/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/chowkuanlaw/teh-tarik-meter?label=download&color=C8874E"></a>
   <img alt="Windows 10 and 11" src="https://img.shields.io/badge/Windows-10%20%7C%2011-3A2A22">
   <img alt="English and Bahasa Melayu" src="https://img.shields.io/badge/language-English%20%7C%20Bahasa%20Melayu-2F8F83">
@@ -10,7 +14,8 @@
 </p>
 
 <p align="center">
-  <b><a href="https://github.com/chowkuanlaw/teh-tarik-meter/releases/latest">Download for Windows</a></b> ·
+  <b><a href="https://apps.microsoft.com/detail/9PGTMV7K7MJQ">Microsoft Store</a></b> ·
+  <a href="https://github.com/chowkuanlaw/teh-tarik-meter/releases/latest">Download from GitHub</a> ·
   <a href="#what-it-does">Features</a> ·
   <a href="#install">Install</a> ·
   <a href="PRIVACY.md">Privacy</a> ·
@@ -90,15 +95,19 @@ Whichever reading is newer wins. The footer of the widget shows when it last syn
 
 ## Install
 
+### From the Microsoft Store (recommended)
+
+<a href="https://apps.microsoft.com/detail/9PGTMV7K7MJQ"><img src="https://get.microsoft.com/images/en-us%20dark.svg" alt="Get it from Microsoft" width="180"></a>
+
+Install **[Teh Tarik Meter from the Microsoft Store](https://apps.microsoft.com/detail/9PGTMV7K7MJQ)**. It's free, signed by Microsoft (no SmartScreen warning), and updates through the Store.
+
 ### From GitHub
+
+If you'd rather not use the Store:
 
 1. Download **`TehTarikMeter-Setup-<version>.exe`** from [Releases](https://github.com/chowkuanlaw/teh-tarik-meter/releases/latest) and run it.
 2. Windows may say *"Windows protected your PC"* because the installer isn't code-signed. Click **More info**, then **Run anyway**.
 3. It installs for you only (no admin needed), starts with Windows, and updates itself from this repository's releases.
-
-### From the Microsoft Store
-
-Coming soon. The Store copy is signed by Microsoft (no SmartScreen warning) and updates through the Store.
 
 ### First run
 
@@ -134,7 +143,7 @@ No. It reads the same usage page you can open on claude.ai, a few times a minute
 Any claude.ai account with a Settings › Usage page. The Claude Code instant feed needs a plan whose status line includes rate limits (Pro and Max).
 
 **Why does Windows warn me when I install it?**
-The GitHub installer isn't code-signed, which costs money every year. The Microsoft Store version is signed by Microsoft.
+The GitHub installer isn't code-signed, which costs money every year. The [Microsoft Store version](https://apps.microsoft.com/detail/9PGTMV7K7MJQ) is signed by Microsoft, so it installs without the warning.
 
 **Is there a Mac version?**
 Not at the moment; it's Windows only.
@@ -165,7 +174,7 @@ To release, bump `version` in `package.json`, add a `## <version>` section to `C
 - Lima minuman (teh tarik, kopi O, Milo ais, teh ais, sirap bandung), mod gelap, dan semua skrin dalam Bahasa Melayu.
 - Pakaian perayaan untuk Hari Raya, Tahun Baru Cina, Deepavali, Kaamatan, Gawai, Merdeka, Hari Malaysia dan Krismas.
 
-Muat turun dari [Releases](https://github.com/chowkuanlaw/teh-tarik-meter/releases/latest). Jika Windows memaparkan amaran, klik **More info**, kemudian **Run anyway**. Tukar bahasa di **Tetapan › Rupa › Bahasa**. Apl ini tidak membaca perbualan anda dan tidak menghantar apa-apa tentang anda ke tempat lain.
+Pasang dari [Microsoft Store](https://apps.microsoft.com/detail/9PGTMV7K7MJQ) (percuma, tanpa amaran Windows), atau muat turun dari [Releases](https://github.com/chowkuanlaw/teh-tarik-meter/releases/latest). Jika versi GitHub memaparkan amaran, klik **More info**, kemudian **Run anyway**. Tukar bahasa di **Tetapan › Rupa › Bahasa**. Apl ini tidak membaca perbualan anda dan tidak menghantar apa-apa tentang anda ke tempat lain.
 
 ## Trademarks
 
