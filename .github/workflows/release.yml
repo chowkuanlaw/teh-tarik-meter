@@ -125,4 +125,12 @@ jobs:
             (cd out && sha256sum TehTarikMeter-Setup-*.exe)
             echo '```'
           } > notes.md
-          gh release create "$TAG" out/* --target "$GITHUB_SHA" --title "Teh Tarik Meter ${TAG#v}" --notes-file notes.md
+          # A release for this tag may already exist (made by hand on GitHub, which also creates the tag
+          # and starts this workflow). Fill that one in instead of failing.
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "Release $TAG already exists: uploading the installer and notes to it."
+            gh release upload "$TAG" out/* --clobber
+            gh release edit "$TAG" --title "Teh Tarik Meter ${TAG#v}" --notes-file notes.md --draft=false --prerelease=false --latest
+          else
+            gh release create "$TAG" out/* --target "$GITHUB_SHA" --title "Teh Tarik Meter ${TAG#v}" --notes-file notes.md
+          fi
